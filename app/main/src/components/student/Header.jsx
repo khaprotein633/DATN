@@ -25,7 +25,11 @@ const Header = () => {
       path: "/student",
     },
     {
-      name: "Làm bài",
+      name: "Luyện tập",
+      path: "/student/practice",
+    },
+    {
+      name: "Sinh đề",
       path: "/student/create/test",
     },
     {

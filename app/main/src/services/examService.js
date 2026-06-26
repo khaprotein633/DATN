@@ -46,6 +46,7 @@ export const getByID = async (id) => {
 export const add = async (data) => {
   try {
     const response = await api.post(`/exam/add`, data);
+    console.log("Add test response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Get test error:", error.response?.data || error.message);
@@ -53,3 +54,12 @@ export const add = async (data) => {
   }
 };
 
+export const removeExam = async (id) => {
+  try {
+    const response = await api.delete(`/exam/remove/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Get test error:", error.response?.data || error.message);
+    throw error.response?.data || new Error("Lỗi khi lấy bài test");
+  }
+};

@@ -39,7 +39,7 @@ const add = async (req, res) => {
     res.status(200).json({ message: "Create exam successfully", test });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: error.message || "Lỗi khi tạo đề thi" });
   }
 };
 

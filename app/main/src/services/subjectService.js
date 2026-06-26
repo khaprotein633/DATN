@@ -45,12 +45,12 @@ export const getList = async (page = 1,limit = 10,search = "") => {
 
 export const getsubjectByid = async (id) => {
   try {
-    const response = await api.get(`/subject/${id}`);
+    const response = await api.get(`/subject/id/${id}`);
 
     return response.data;
   } catch (error) {
     throw new Error(
-      error.response?.data?.message || "Lấy list môn học thất bại"
+      error.response?.data?.message || "Lấy thông tin môn học thất bại"
     );
   }
 };

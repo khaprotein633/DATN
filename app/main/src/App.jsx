@@ -26,6 +26,10 @@ import UserManagement from "./pages/admin/UserManagement";
 import SubjectManagement from "./pages/admin/SubjectManagement";
 import ExamManagement from "./pages/admin/ExamManagement";
 import Question from "./pages/admin/Question";
+import SubjectLists from "./pages/user/practice/SubjectLists";
+import PracticeSetup from "./pages/user/practice/PracticeSetup";
+import Practice from "./pages/user/practice/Practice";
+import PracticeResult from "./pages/user/practice/PracticeResult";
 
 function App() {
 
@@ -44,6 +48,10 @@ function App() {
           <Route path="/student" element={<MainLayout />}>
             <Route index element={<Home />} />
             <Route path="home" element={<Home />} />
+            <Route path="practice" element={<SubjectLists />} />
+            <Route path="practice/subject/:subjectId" element={<PracticeSetup />} />
+            <Route path="practice/subject/:subjectId/lesson/:lessonId" element={<Practice />} />
+            <Route path="practice/subject/:subjectId/lesson/:lessonId/result" element={<PracticeResult />} />
             <Route path="create/test" element={<CreateExam />} />
             <Route path="result/:id" element={<Result />} />
             <Route path="profile" element={<Profile />} />

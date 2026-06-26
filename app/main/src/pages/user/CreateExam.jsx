@@ -45,7 +45,7 @@ const CreateExam = () => {
         chapters: [],
         lessons: [],
         difficulty: "medium",
-        questionCount: 20,
+        questionCount: 5,
         duration: 15,
     });
 
@@ -115,6 +115,7 @@ const CreateExam = () => {
             navigate(`/exam/${data.test._id}`)
 
         } catch (error) {
+            console.log(error);
             toast.error(error.message || "Tạo đề thất bại")
         } finally {
             setLoading(false);
@@ -373,7 +374,7 @@ const CreateExam = () => {
                                 }
                                 className="w-full border border-slate-200 rounded-xl px-4 py-3"
                             >
-                                <option value={20}>20 câu</option>
+                                <option value={5}>20 câu</option>
                                 <option value={30}>30 câu</option>
                                 <option value={40}>40 câu</option>
                                 <option value={50}>50 câu</option>

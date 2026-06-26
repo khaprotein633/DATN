@@ -163,7 +163,7 @@ const add = async (data) => {
 
     // lấy toàn bộ question 
     const questions = await Question.find({ lesson_id: lessonId });
-
+    //console.log("questions", questions);
     if (questions.length < lessonQuestionCount) {
       throw new Error(`Lesson ${lessonId} không đủ câu hỏi`);
     }
@@ -224,7 +224,8 @@ const add = async (data) => {
   finalQuestions =
     finalQuestions.sort(
       () => Math.random() - 0.5
-    );
+    );  
+    console.log("finalQuestions", finalQuestions);
 
   const newtitle = "Đề thi môn: " + name_subject.name;
 
@@ -236,6 +237,7 @@ const add = async (data) => {
 
     questions: finalQuestions.map((q) => ({
       question_id: q._id,
+      image: q.image,
       lesson_id: q.lesson_id,
       chapter_id: q.chapter_id,
       subject_id: q.subject_id,
@@ -277,7 +279,7 @@ const update = async (data) => {
 const remove = async (id) => {
   const chap = await examM.findById(id);
   if (!chap) throw new Error("exam not found");
-  await chap.destroy();
+  await examM.findByIdAndDelete(id);
   return { message: "exam deleted successfully" };
 };
 

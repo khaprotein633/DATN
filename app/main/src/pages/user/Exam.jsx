@@ -2,14 +2,14 @@ import { Clock3, Flag, ArrowLeft } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { getByID } from "../../services/examService";
+import { getByID, removeExam } from "../../services/examService";
 import { add } from "../../services/resultService";
 import { useAuth } from "../../contexts/AuthContext";
-import { Modal } from "antd";
+import { Modal, Image } from "antd";
 import ExamSkeleton from "../user/skeleton/ExamSkeleton";
 
 const Exam = () => {
-  const { user,authLoading } = useAuth();
+  const { user, authLoading } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -24,7 +24,7 @@ const Exam = () => {
   const [markedQuestions, setMarkedQuestions] = useState([]);
 
   useEffect(() => {
-    if(authLoading) return;
+    if (authLoading) return;
     if (!user) {
       navigate("/auth/login");
       return;
@@ -37,6 +37,7 @@ const Exam = () => {
     try {
       setExamLoading(true);
       const data = await getByID(id);
+      console.log("data:", data);
       setExam(data.test);
 
       if (data.test?.time) {
@@ -70,7 +71,7 @@ const Exam = () => {
     }
   };
 
-  useEffect(() => { 
+  useEffect(() => {
 
     if (examLoading || timeLeft === null) return;
 
@@ -108,6 +109,7 @@ const Exam = () => {
   };
 
   const unansweredCount = exam.questions.filter((q) => !answers[q.question_id]).length;
+  console.log("currentQuestion:", currentQuestion);
 
   const modalchualamxong = () => {
     Modal.confirm({
@@ -148,8 +150,13 @@ const Exam = () => {
       okText: "Thoát",
       cancelText: "Ở lại",
       okButtonProps: { danger: true },
-      onOk() {
-        navigate("/student/home");
+      onOk: async () => {
+        try {
+          await removeExam(id);
+          navigate("/student/create/test");
+        } catch (error) {
+          message.error("Thoát bài thi thất bại");
+        }
       },
     });
   };
@@ -195,8 +202,8 @@ const Exam = () => {
 
               <button
                 className={`flex items-center gap-2 ${markedQuestions.includes(currentQuestion?.question_id)
-                    ? "text-yellow-500 hover:text-yellow-600"
-                    : "text-slate-500 hover:text-slate-700"
+                  ? "text-yellow-500 hover:text-yellow-600"
+                  : "text-slate-500 hover:text-slate-700"
                   }`}
                 onClick={() => {
                   const qId = currentQuestion.question_id;
@@ -216,7 +223,24 @@ const Exam = () => {
             <h2 className="text-lg font-medium text-slate-800 leading-relaxed mb-8">
               {currentQuestion?.content}
             </h2>
-
+            {currentQuestion.image && (
+              <div
+                style={{
+                  textAlign: "center",
+                  margin: "20px 0",
+                }}
+              >
+                <Image
+                  src={currentQuestion.image}
+                  alt="Hình minh họa"
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: 350,
+                    borderRadius: 8,
+                  }}
+                />
+              </div>
+            )}
             <div className="space-y-4">
               {currentQuestion?.options.map((answer, index) => {
                 const option = String.fromCharCode(65 + index);
@@ -292,12 +316,12 @@ const Exam = () => {
                     key={question.question_id}
                     onClick={() => setCurrentQuestionIndex(index)}
                     className={`h-10 rounded-lg text-sm font-medium transition ${isCurrent
-                        ? "bg-indigo-600 text-white"
-                        : isMarked
-                          ? "bg-yellow-300 text-yellow-800"
-                          : isAnswered
-                            ? "bg-green-300 text-green-800"
-                            : "bg-slate-200 hover:bg-slate-300"
+                      ? "bg-indigo-600 text-white"
+                      : isMarked
+                        ? "bg-yellow-300 text-yellow-800"
+                        : isAnswered
+                          ? "bg-green-300 text-green-800"
+                          : "bg-slate-200 hover:bg-slate-300"
                       }`}
                   >
                     {index + 1}

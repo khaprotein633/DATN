@@ -15,6 +15,7 @@ const optionSchema = new mongoose.Schema(
 const questionSchema = new mongoose.Schema({
   question_id: { type: String, required: true },
   subject_id: { type: String, required: true },
+   image: { type: String, default: null },
   lesson_id: { type: String, required: true },
   chapter_id: { type: String, required: true },
   knowledgeType: { type: String, required: true, },

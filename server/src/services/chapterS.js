@@ -1,6 +1,6 @@
 const chapterM = require("../models/chapterM");
 const lessonM = require("../models/lessonM");
-
+const questionM = require("../models/questionM");
 
 const getAll = async () => {
   return await chapterM.find();
@@ -47,6 +47,34 @@ const getById = async (id) => {
 const getBySubjectId = async (subject_id) => {
   return await chapterM.find({ subject_id });
 }
+
+const getAllBySubject = async (subject_id) => {
+  const chapters = await chapterM.find({ subject_id }).sort({ order: 1 });
+  const data = await Promise.all(
+    chapters.map(async (chapter) => {
+      const lessons = await lessonM.find({
+        chapter_id: chapter._id,
+      }).sort({ order: 1 });
+      const lessonData = await Promise.all(
+        lessons.map(async (lesson) => {
+          const totalQuestions = await questionM.countDocuments({
+            lesson_id: lesson._id,
+          });
+          return {
+            ...lesson.toObject(),
+            totalQuestions,
+          };
+
+        })
+      );
+      return {
+        ...chapter.toObject(),
+        lessons: lessonData,
+      };
+    })
+  );
+  return data;
+};
 
 const add = async (data) => {
   const exists = await chapterM.findOne(
@@ -118,6 +146,7 @@ module.exports = {
   getList,
   getById,
   getBySubjectId,
+  getAllBySubject,
   add,
   update,
   remove,

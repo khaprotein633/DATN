@@ -51,6 +51,23 @@ export const getAllQuestionBySubject = async (subject_id) => {
   }
 };
 
+export const getAllQuestionByLesson = async ( lesson_id,total) => {
+  try {
+    const response = await api.get(`/question/lesson/${lesson_id}`, {
+      params: {
+        total,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Get question error:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data || new Error("Lỗi khi lấy câu hỏi");
+  }
+};
+
 export const addQuestion = async (data) => {
   try {
     const formData = new FormData();
@@ -246,7 +263,6 @@ export const importQuestionExcel = async (
 
   }
 };
-
 
 export const downloadQuestionTemplate = async (subject_id) => {
   try {

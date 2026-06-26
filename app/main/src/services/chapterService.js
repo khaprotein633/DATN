@@ -37,6 +37,16 @@ export const getListChaperBySubject = async (page = 1,limit = 10,search = "",sub
   }
 };
 
+export const getSummaryBySubject = async (subject_id) => {
+  try {
+    const response = await api.get(`/chapter/summary/subject/${subject_id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Get chapter error:", error.response?.data || error.message);
+    throw error.response?.data || new Error("Lỗi khi lấy chương môn học");
+  }
+};
+
 export const getChaperByID = async (_id) => {
   try {
     const response = await api.get(`/chapter/${_id}`);

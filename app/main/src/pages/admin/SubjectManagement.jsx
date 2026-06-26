@@ -861,10 +861,8 @@ const SubjectManagement = () => {
             >
               Thêm môn học
             </Button>
-
           </div>
         </div>
-
         <div className="p-4">
 
           <Table
@@ -882,11 +880,8 @@ const SubjectManagement = () => {
           />
 
         </div>
-
       </div>
-
       {/* CHAPTER MODAL */}
-
       <Modal
         title={null}
         open={openChapterModal}
@@ -946,7 +941,6 @@ const SubjectManagement = () => {
         </div>
 
       </Modal>
-
       {/* LESSON DRAWER */}
 
       <Drawer

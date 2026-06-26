@@ -44,6 +44,18 @@ const getBySubjectId = async (req, res) => {
   }
 };
 
+
+const getAllBySubject = async (req, res) => {
+  try {
+    const { subject_id } = req.params;
+    const list = await chapterServices.getAllBySubject(subject_id);
+    res.status(200).json(list);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(404).json({ message: error.message });
+  }
+};
+
 const add = async (req, res) => {
   try {
 
@@ -81,6 +93,7 @@ module.exports = {
   getList,
   getById,
   getBySubjectId,
+  getAllBySubject,
   add,
   update,
   remove

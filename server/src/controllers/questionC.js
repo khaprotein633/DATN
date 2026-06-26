@@ -71,11 +71,19 @@ const getQuestionsByChapter = async (req, res) => {
 const getQuestionsByLesson = async (req, res) => {
   try {
     const { lesson_id } = req.params;
-    const list = await questionServices.getByLessonId(lesson_id);
-    res.status(200).json({ list });
+    const { total } = req.query;
+
+    const list = await questionServices.getByLessonId(
+      lesson_id,
+      total
+    );
+
+    res.status(200).json( list );
   } catch (error) {
     console.error("Error:", error);
-    res.status(404).json({ message: error.message });
+    res.status(404).json({
+      message: error.message,
+    });
   }
 };
 

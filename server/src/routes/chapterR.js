@@ -9,6 +9,7 @@ router.get("/all",protectRoute,chapterController.getAll);
 router.get("/list/:subject_id",protectRoute,chapterController.getList);
 router.get("/:id",protectRoute,chapterController.getById)
 router.get("/subject/:subject_id",protectRoute,chapterController.getBySubjectId)
+router.get("/summary/subject/:subject_id",protectRoute,chapterController.getAllBySubject)
 
 router.post("/add",protectRoute,authorize("admin"),chapterController.add)
 router.put("/update/",protectRoute,authorize("admin"),chapterController.update)

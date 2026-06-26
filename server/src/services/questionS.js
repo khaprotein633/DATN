@@ -1,7 +1,7 @@
 const questionM = require("../models/questionM");
 const subjectM = require("../models/subjectM");
 const cloudinary = require("../config/cloudinary");
-
+const mongoose = require("mongoose");
 const chapterM = require("../models/chapterM");
 const lessonM = require("../models/lessonM");
 const XLSX = require("xlsx");
@@ -109,10 +109,22 @@ const getById = async (id) => {
   return list;
 };
 
-const getByLessonId = async (lesson_id) => {
+const getByLessonId = async (lesson_id, total) => {
   const list = await questionM.find({ lesson_id });
-  if (!list) throw new Error("question not found");
-  return list;
+
+console.log(list.length);
+  return await questionM.aggregate([
+    {
+      $match: {
+        lesson_id: new mongoose.Types.ObjectId(lesson_id),
+      },
+    },
+    {
+      $sample: {
+        size: Number(total),
+      },
+    },
+  ]);
 };
 
 const getByChapterId = async (chapter_id) => {

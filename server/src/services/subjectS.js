@@ -53,6 +53,7 @@ const getList = async (
       },
     ];
   }
+
   const totalLesson = await lessonM.countDocuments();
   const totalChapter = await chapterM.countDocuments();
   const totalSubject = await subjectM.countDocuments();
@@ -61,13 +62,41 @@ const getList = async (
   const subjects = await subjectM
     .find(query)
     .skip((page - 1) * limit)
-    .limit(limit);
+    .limit(limit)
+    .lean();
+
+  const subjectsWithTotal = await Promise.all(
+    subjects.map(async (subject) => {
+      const chapters = await chapterM.find({
+        subject_id: subject._id,
+      });
+
+      const chapterIds = chapters.map((ch) => ch._id);
+
+      const totalQuestion = await questionM.countDocuments({
+        subject_id: subject._id,
+      });
+
+      const totalLesson = await lessonM.countDocuments({
+        chapter_id: {
+          $in: chapterIds,
+        },
+      });
+
+      return {
+        ...subject,
+        totalQuestion,
+        totalChapter: chapters.length,
+        totalLesson,
+      };
+    })
+  );
 
   return {
     totalLesson,
     totalSubject,
     totalChapter,
-    subjects,
+    subjects: subjectsWithTotal,
     pagination: {
       page,
       limit,
