@@ -88,7 +88,7 @@ const getList = async (
 };
 
 const getById = async (id) => {
-  const exam = await examM.findById(id);
+  const exam = await examM.findById(id).populate("subject_id", "name");
   if (!exam) throw new Error("exam not found");
   return exam;
 };

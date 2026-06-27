@@ -17,11 +17,25 @@ const Exam = () => {
   const [examLoading, setExamLoading] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const [timeLeft, setTimeLeft] = useState(null);
-
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [markedQuestions, setMarkedQuestions] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(null);
+
+
+  const storageKey = `exam_${id}`;
+  const saveProgress = (customTimeLeft = timeLeft) => {
+    if (customTimeLeft === null) return;
+
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify({
+        answers,
+        currentQuestionIndex,
+        timeLeft: customTimeLeft,
+      })
+    );
+  };
 
   useEffect(() => {
     if (authLoading) return;
@@ -32,44 +46,17 @@ const Exam = () => {
     fetchExam();
   }, [user]);
 
+  useEffect(() => {
+    saveProgress();
+  }, [answers, currentQuestionIndex]);
 
-  const fetchExam = async () => {
-    try {
-      setExamLoading(true);
-      const data = await getByID(id);
-      console.log("data:", data);
-      setExam(data.test);
+  useEffect(() => {
+    if (timeLeft === null) return;
 
-      if (data.test?.time) {
-        setTimeLeft(Number(data.test.time) * 60);
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error(err.message || "Tải đề thất bại");
-    } finally {
-      setExamLoading(false);
+    if (timeLeft % 10 === 0) {
+      saveProgress(timeLeft);
     }
-  };
-
-  const handleSubmit = async () => {
-    const result = {
-      user_id: user?._id,
-      exam_id: id,
-      answers: answers,
-    };
-
-    try {
-      setLoading(true);
-      const data = await add(result);
-      console.log("data:", data.result._id);
-      toast.success(data.message || "Nộp bài thành công!");
-
-      navigate(`/student/result/${data.result._id}`);
-    } catch (error) {
-      toast.error(error.message || "Nộp bài thất bại");
-      setLoading(false);
-    }
-  };
+  }, [timeLeft]);
 
   useEffect(() => {
 
@@ -92,13 +79,52 @@ const Exam = () => {
 
   }, [timeLeft, examLoading]);
 
-  if (!user || examLoading || !exam) {
-    return (
-      <ExamSkeleton />
-    );
-  }
+  const fetchExam = async () => {
+    try {
+      setExamLoading(true);
+      const data = await getByID(id);
+      setExam(data.test);
+      const saved = localStorage.getItem(storageKey);
 
-  const currentQuestion = exam.questions[currentQuestionIndex];
+      if (saved) {
+        const progress = JSON.parse(saved);
+
+        setAnswers(progress.answers || {});
+        setCurrentQuestionIndex(progress.currentQuestionIndex || 0);
+        setTimeLeft(progress.timeLeft ?? data.test.time * 60);
+      } else {
+        setTimeLeft(data.test.time * 60);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Tải đề thất bại");
+    } finally {
+      setExamLoading(false);
+    }
+  };
+
+  const currentQuestion = exam?.questions[currentQuestionIndex];
+  const unansweredCount = exam?.questions.filter((q) => !answers[q.question_id]).length;
+  const handleSubmit = async () => {
+    const result = {
+      user_id: user?._id,
+      exam_id: id,
+      answers: answers,
+    };
+
+    try {
+      setLoading(true);
+      const data = await add(result);
+      //console.log("data:", data.result._id);
+      localStorage.removeItem(storageKey);
+      toast.success(data.message || "Nộp bài thành công!");
+
+      navigate(`/student/result/${data.result._id}`);
+    } catch (error) {
+      toast.error(error.message || "Nộp bài thất bại");
+      setLoading(false);
+    }
+  };
 
   // Format định dạng hiển thị thời gian trực quan (00:00)
   const formatTime = () => {
@@ -107,9 +133,6 @@ const Exam = () => {
     const secs = timeLeft % 60;
     return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   };
-
-  const unansweredCount = exam.questions.filter((q) => !answers[q.question_id]).length;
-  console.log("currentQuestion:", currentQuestion);
 
   const modalchualamxong = () => {
     Modal.confirm({
@@ -153,6 +176,7 @@ const Exam = () => {
       onOk: async () => {
         try {
           await removeExam(id);
+          localStorage.removeItem(storageKey);
           navigate("/student/create/test");
         } catch (error) {
           message.error("Thoát bài thi thất bại");
@@ -160,6 +184,13 @@ const Exam = () => {
       },
     });
   };
+
+  if (!user || examLoading || !exam) {
+    return (
+      <ExamSkeleton />
+    );
+  }
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6">
@@ -343,11 +374,11 @@ const Exam = () => {
               </div>
               <div className="flex justify-between">
                 <span>Độ khó</span>
-                <span>Trung bình</span>
+                <span>{exam.difficulty}</span>
               </div>
               <div className="flex justify-between">
                 <span>Chương</span>
-                <span>OOP</span>
+                <span>{exam.subject_id.name}</span>
               </div>
             </div>
           </div>
