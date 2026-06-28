@@ -30,7 +30,7 @@ import SubjectLists from "./pages/user/practice/SubjectLists";
 import PracticeSetup from "./pages/user/practice/PracticeSetup";
 import Practice from "./pages/user/practice/Practice";
 import PracticeResult from "./pages/user/practice/PracticeResult";
-
+import Question_Answers from "./pages/user/practice/Question_Answers";
 function App() {
 
 
@@ -49,9 +49,10 @@ function App() {
             <Route index element={<Home />} />
             <Route path="home" element={<Home />} />
             <Route path="practice" element={<SubjectLists />} />
-            <Route path="practice/subject/:subjectId" element={<PracticeSetup />} />
-            <Route path="practice/subject/:subjectId/lesson/:lessonId" element={<Practice />} />
-            <Route path="practice/subject/:subjectId/lesson/:lessonId/result" element={<PracticeResult />} />
+            {/* <Route path="practice/subject/:subjectId" element={<PracticeSetup />} /> */}
+            <Route path="practice/subject/:subjectId" element={<Question_Answers />} />
+            {/* <Route path="practice/subject/:subjectId/lesson/:lessonId" element={<Practice />} /> */}
+            {/* <Route path="practice/subject/:subjectId/lesson/:lessonId/result" element={<PracticeResult />} /> */}
             <Route path="create/test" element={<CreateExam />} />
             <Route path="result/:id" element={<Result />} />
             <Route path="profile" element={<Profile />} />
