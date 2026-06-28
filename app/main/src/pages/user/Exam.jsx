@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getByID, removeExam } from "../../services/examService";
+import { getAllByExam } from "../../services/resultService";
 import { add } from "../../services/resultService";
 import { useAuth } from "../../contexts/AuthContext";
 import { Modal, Image } from "antd";
@@ -14,6 +15,7 @@ const Exam = () => {
   const navigate = useNavigate();
 
   const [exam, setExam] = useState(null);
+   const [results, setResults] = useState([]);
   const [examLoading, setExamLoading] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -44,6 +46,7 @@ const Exam = () => {
       return;
     }
     fetchExam();
+    fetchAllResultByExam();
   }, [user]);
 
   useEffect(() => {
@@ -101,6 +104,16 @@ const Exam = () => {
     } finally {
       setExamLoading(false);
     }
+  };
+
+  const fetchAllResultByExam = async () => {
+    try {
+      const data = await getAllByExam(id);
+      setResults(data.list);
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Tải kết quả thất bại");
+    } 
   };
 
   const currentQuestion = exam?.questions[currentQuestionIndex];
@@ -175,7 +188,9 @@ const Exam = () => {
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
+          if(results.length === 0) {
           await removeExam(id);
+          }
           localStorage.removeItem(storageKey);
           navigate("/student/create/test");
         } catch (error) {
@@ -251,7 +266,7 @@ const Exam = () => {
               </button>
             </div>
 
-            <h2 className="text-lg font-medium text-slate-800 leading-relaxed mb-8">
+            <h2 className="text-lg font-medium text-slate-800 leading-relaxed mb-8 whitespace-pre-wrap">
               {currentQuestion?.content}
             </h2>
             {currentQuestion.image && (

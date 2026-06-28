@@ -18,15 +18,25 @@ const getList = async (
   lesson_id = "",
   difficulty = "",
   knowledgeType = "",
-
   search = ""
 ) => {
+  
   const query = {};
   let subject = {};
 
+
+  const escapeRegex = (text) => {
+    return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  };
+
+  const normalizeSearch = (text) => {
+    return text
+      .trim()
+      .replace(/\s+/g, "\\s+");
+  };
   if (search) {
     query.content = {
-      $regex: search,
+      $regex: normalizeSearch(escapeRegex(search)),
       $options: "i",
     };
   }
@@ -49,6 +59,21 @@ const getList = async (
     query.lesson_id = lesson_id;
   }
 
+  const easyQuery = {
+    ...query,
+    difficulty: "easy",
+  };
+
+  const mediumQuery = {
+    ...query,
+    difficulty: "medium",
+  };
+
+  const hardQuery = {
+    ...query,
+    difficulty: "hard",
+  };
+
   const [
     totalQuestion,
     totalEasy,
@@ -56,24 +81,13 @@ const getList = async (
     totalHard,
     total,
   ] = await Promise.all([
-    questionM.countDocuments({
-      subject_id: subject_id
-    }),
+    questionM.countDocuments(query),
 
-    questionM.countDocuments({
-      subject_id: subject_id,
-      difficulty: "easy",
-    }),
+    questionM.countDocuments(easyQuery),
 
-    questionM.countDocuments({
-      subject_id: subject_id,
-      difficulty: "medium",
-    }),
+    questionM.countDocuments(mediumQuery),
 
-    questionM.countDocuments({
-      subject_id: subject_id,
-      difficulty: "hard",
-    }),
+    questionM.countDocuments(hardQuery),
 
     questionM.countDocuments(query),
   ]);
@@ -112,7 +126,7 @@ const getById = async (id) => {
 const getByLessonId = async (lesson_id, total) => {
   const list = await questionM.find({ lesson_id });
 
-console.log(list.length);
+  console.log(list.length);
   return await questionM.aggregate([
     {
       $match: {

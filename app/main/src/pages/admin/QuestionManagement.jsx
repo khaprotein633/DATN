@@ -142,7 +142,7 @@ const QuestionManagement = () => {
     }
     fetchQuestions();
     fetchChapters();
-  }, [user, id, currentPage, selectedChapter, selectedLesson, difficulty, debouncedSearch]);
+  }, [user, id, currentPage, selectedChapter, selectedLesson, difficulty,knowledgeType, debouncedSearch]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -150,9 +150,10 @@ const QuestionManagement = () => {
     }, 500);
     return () => clearTimeout(timer);
   }, [searchText]);
+
   const fetchQuestions = async () => {
     try {
-      const res = await getListQuestion(currentPage, 10, id, selectedChapter, selectedLesson, difficulty, "", debouncedSearch);
+      const res = await getListQuestion(currentPage, 10, id, selectedChapter, selectedLesson, difficulty, knowledgeType, debouncedSearch);
       setSubject(res.subject)
       setTotalEasy(res.totalEasy)
       setTotalMedium(res.totalMedium)
@@ -743,6 +744,24 @@ const QuestionManagement = () => {
                 </Select.Option>
               ))}
             </Select>
+              <Select
+              allowClear
+              placeholder="Loại kiên thức"
+              style={{ width: 160 }}
+              value={ knowledgeType|| undefined}
+              onChange={(value) => {
+                setKnowledgeType(value || "");
+                setCurrentPage(1);
+              }}
+            >
+              <Select.Option value="concept">
+                Concept
+              </Select.Option>
+
+              <Select.Option value="exercise">
+                Exercise
+              </Select.Option>
+            </Select>
 
             <Select
               allowClear
@@ -1248,7 +1267,7 @@ const QuestionManagement = () => {
               <strong>Nội dung:</strong>
 
               <Card className="mt-2">
-                <p>{viewQuestion?.content}</p>
+                <p className="whitespace-pre-wrap">{viewQuestion?.content}</p>
 
                 {viewQuestion?.image && (
                   <Image

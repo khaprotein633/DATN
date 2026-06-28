@@ -26,6 +26,7 @@ export const getListQuestion = async (
         subject_id,
         chapter_id,
         lesson_id,
+        knowledgeType,
         difficulty,
         search,
       },

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Outlet, useNavigate, useLocation,Navigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation, Navigate } from "react-router-dom";
 
 import {
   Layout,
@@ -23,7 +23,7 @@ import {
   LogoutOutlined,
 } from "@ant-design/icons";
 
-import {useAuth} from "../../contexts/AuthContext"
+import { useAuth } from "../../contexts/AuthContext"
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -32,15 +32,14 @@ const { Text } = Typography;
 const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
 
-  const { user,authLoading } = useAuth();
+  const { user, authLoading, logoutUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   if (authLoading) {
     return <Spin fullscreen />;
   }
-  console.log("user:",user);
-   if (!user) {
+  if (!user) {
     return <Navigate to="/auth/login" replace />;
   }
 
@@ -83,6 +82,12 @@ const AdminLayout = () => {
         label: "Đăng xuất",
       },
     ],
+    onClick: ({ key }) => {
+      if (key === "logout") {
+        logoutUser()
+        navigate("/student", { replace: true });
+      }
+    },
   };
 
   return (

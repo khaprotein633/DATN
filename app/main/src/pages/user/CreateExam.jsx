@@ -191,11 +191,11 @@ const CreateExam = () => {
             {/* Header */}
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-slate-800">
-                    Tạo bài kiểm tra
+                    Tạo đề trắc nghiệm
                 </h1>
 
                 <p className="text-slate-500 mt-2">
-                    Tạo đề thi ngẫu nhiên từ ngân hàng câu hỏi
+                    Tạo đề từ ngân hàng câu hỏi
                 </p>
             </div>
 
@@ -526,7 +526,7 @@ const CreateExam = () => {
                 {/* Preview */}
                 <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm h-fit">
                     <h2 className="font-semibold text-lg mb-6">
-                        Thông tin đề thi
+                        Thông tin đề 
                     </h2>
 
                     <div className="space-y-5">
@@ -599,7 +599,7 @@ const CreateExam = () => {
 
                     <div className="mt-8 p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
                         <p className="text-sm text-slate-600">
-                            Hệ thống sẽ tạo đề thi ngẫu nhiên từ ngân hàng câu hỏi phù hợp với các tiêu chí đã chọn.
+                            Hệ thống sẽ tạo đề trắc nghiệm ngẫu nhiên từ ngân hàng câu hỏi phù hợp với các tiêu chí đã chọn.
                         </p>
                     </div>
                 </div>

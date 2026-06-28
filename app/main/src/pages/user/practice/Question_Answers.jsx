@@ -274,7 +274,7 @@ const Question_Answers = () => {
                                 borderRadius: 12
                             }}
                         >
-                            <Title level={5}>
+                            <Title className='whitespace-pre-wrap' level={5}>
                                 Câu {index + 1}. {item.content}
                             </Title>
                             {item.image && (

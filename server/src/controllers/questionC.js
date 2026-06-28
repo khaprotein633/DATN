@@ -24,7 +24,7 @@ const getList = async (req, res) => {
       knowledgeType = "",
       search = "",
     } = req.query;
-
+    console.log("req.query:", req.query);
     const list = await questionServices.getList(
       Number(page),
       Number(limit),

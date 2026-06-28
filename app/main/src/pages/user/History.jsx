@@ -111,8 +111,9 @@ const History = () => {
     }
   };
 
-  const handleLamLai = () => {
-    
+  const handleLamLai = (exam) => {
+    console.log("Làm lại bài thi:", exam.exam_id);
+       navigate(`/exam/${exam.exam_id}`);
   }
 
   const openHistory = (exam) => {
@@ -123,7 +124,7 @@ const History = () => {
 
   const detailColumns = [
     {
-      title: "Lần thi",
+      title: "Lần làm",
       align: "center",
       render: (_, record, index) => (
         <Tag color="blue">
@@ -133,7 +134,7 @@ const History = () => {
     },
 
     {
-      title: "Ngày thi",
+      title: "Ngày làm",
       dataIndex: "createdAt",
       align: "center",
       render: (date) =>
@@ -173,11 +174,11 @@ const History = () => {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold">
-            Lịch sử bài thi
+            Lịch sử bài
           </h1>
 
           <p className="text-gray-500 mt-1">
-            Xem lại các bài thi đã thực hiện
+            Xem lại các bài trắc nghiệm đã thực hiện
             và tiếp tục ôn tập.
           </p>
         </div>
@@ -280,7 +281,7 @@ const History = () => {
                     icon={
                       <ReloadOutlined />
                     }
-                    onClick={handleLamLai}
+                    onClick={() => handleLamLai(exam)}
                   >
                     Làm lại
                   </Button>

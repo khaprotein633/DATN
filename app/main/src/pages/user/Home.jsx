@@ -167,12 +167,12 @@ const Home = () => {
                       value={overview.totalQuestions}
                     />
                   </Col>
-                  <Col span={12}>
+                  {/* <Col span={12}>
                     <Statistic
-                      title="Đề thi"
+                      title="Đề trắc nghiệm"
                       value={overview.totalExams}
                     />
-                  </Col>
+                  </Col> */}
                   <Col span={12}>
                     <Statistic
                       title="Lượt làm"
@@ -191,7 +191,7 @@ const Home = () => {
           <h2 className="text-2xl font-bold">
             Môn học
           </h2>
-          <Button type="link">
+          <Button type="link" onClick={() => navigate("/student/practice")}>
             Xem tất cả →
           </Button>
         </div>

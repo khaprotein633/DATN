@@ -45,7 +45,7 @@ const getById = async (id) => {
 };
 
 const getBySubjectId = async (subject_id) => {
-  return await chapterM.find({ subject_id });
+  return await chapterM.find({ subject_id }).sort({ order: 1 });
 }
 
 const getAllBySubject = async (subject_id) => {
