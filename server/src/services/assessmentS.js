@@ -5,9 +5,6 @@ const examM = require("../models/examM");
 const resultM = require("../models/resultM");
 
 const getBySubjectId = async (subject_id, user_id) => {
-    //lấy danh sách bài thi ra
-   
-
     //lấy danh sách kết quả ra
     const allResults = await resultM.find({
         user_id: user_id,
@@ -58,16 +55,16 @@ const getBySubjectId = async (subject_id, user_id) => {
     const worstScore = Math.min(...scores);
     // lấy lịch sử làm bài 
     const progressChart = historyResults
-        .slice() // copy
-        .reverse() // cũ -> mới
+        .slice()
+        .reverse()
         .map((result, index) => ({
             attempt: index + 1,
             score: result.score,
             date: result.createdAt
         }));
 
+    // Lấy danh sách chương và bài học để ánh xạ tên
     const chapters = await chapterM.find({ subject_id }).sort({ order: 1 });;
-
     const chapterNameMap = {};
     //  const chapterCodeMap = {};
     const chapterOrderMap = {};
@@ -89,9 +86,9 @@ const getBySubjectId = async (subject_id, user_id) => {
 
     // thực hiện tính toán đánh giá dựa trên kết quả 10 bài thi gần nhất
     const allAnswers = assessmentResults.flatMap(r => r.answers);
+    // thống kê theo chương và bài học
     const chapterMap = {};
     allAnswers.forEach(answer => {
-
         if (!chapterMap[answer.chapter_id]) {
             chapterMap[answer.chapter_id] = {
                 total: 0,
@@ -99,28 +96,22 @@ const getBySubjectId = async (subject_id, user_id) => {
                 lessons: {}
             };
         }
-
         chapterMap[answer.chapter_id].total++;
-
         if (answer.isCorrect) {
             chapterMap[answer.chapter_id].correct++;
         }
 
         const lessonId = answer.lesson_id;
-
         if (!chapterMap[answer.chapter_id].lessons[lessonId]) {
             chapterMap[answer.chapter_id].lessons[lessonId] = {
                 total: 0,
                 correct: 0
             };
         }
-
         chapterMap[answer.chapter_id].lessons[lessonId].total++;
-
         if (answer.isCorrect) {
             chapterMap[answer.chapter_id].lessons[lessonId].correct++;
         }
-
     });
 
     const chapterStats = Object.entries(chapterMap).map(
@@ -129,34 +120,58 @@ const getBySubjectId = async (subject_id, user_id) => {
             const mastery = Math.round((chapterData.correct / chapterData.total) * 100);
 
             const lessons = Object.entries(chapterData.lessons)
-                .map(
-                    ([lesson_id, lessonData]) => ({
-                        lesson_id,
-                        lesson_name: lessonNameMap[lesson_id] || "Không xác định",
-                        order: lessonOrderMap[lesson_id] || 999,
+                .map(([lesson_id, lessonData]) => {
+                    const mastery = Math.round((lessonData.correct / lessonData.total) * 100);
+                    return {
+                        lesson_id: lesson_id,
+                        lesson_name: lessonNameMap[lesson_id],
+                        order: lessonOrderMap[lesson_id],
                         total: lessonData.total,
-                        mastery: Math.round(
-                            (lessonData.correct / lessonData.total) * 100
-                        )
-                    })
-                ).sort((a, b) => a.order - b.order);
+                        mastery: mastery
+                    };
+                });
+
+            lessons.sort((a, b) => {
+                return a.order - b.order;
+            });
 
             return {
                 chapter_id,
-                
                 total: chapterData.total,
-                chapter_name: chapterNameMap[chapter_id] || "Không xác định",
+                chapter_name: chapterNameMap[chapter_id],
                 mastery,
                 order: chapterOrderMap[chapter_id],
                 lessons
             };
         }
     );
-
-    
     chapterStats.sort((a, b) => a.order - b.order);
-    const knowledgeMap = {};
 
+    //thống kê theo mức độ khó và loại kiến thức
+    const difficultyStats = {};
+    allAnswers.forEach(answer => {
+        const difficulty = answer.difficulty;
+        if (!difficultyStats[difficulty]) {
+            difficultyStats[difficulty] = {
+                total: 0,
+                correct: 0
+            };
+        }
+        difficultyStats[difficulty].total++;
+        if (answer.isCorrect) {
+            difficultyStats[difficulty].correct++;
+        }
+    });
+
+    Object.keys(difficultyStats).forEach(difficulty => {
+        const item = difficultyStats[difficulty];
+        item.mastery = Math.round(
+            item.correct / item.total * 100
+        );
+
+    });
+
+    const knowledgeMap = {};
     allAnswers.forEach(answer => {
 
         if (!knowledgeMap[answer.knowledgeType]) {
@@ -176,7 +191,6 @@ const getBySubjectId = async (subject_id, user_id) => {
     const knowledgeStats = {};
     Object.entries(knowledgeMap).forEach(
         ([key, value]) => {
-
             knowledgeStats[key] = Math.round(
                 (value.correct / value.total) * 100
             );
@@ -235,7 +249,7 @@ const getBySubjectId = async (subject_id, user_id) => {
             bestScore,
             worstScore,
         },
-
+        difficultyStats,
         summary,
         progressChart,
         strongest,

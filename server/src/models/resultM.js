@@ -5,6 +5,7 @@ const answerSchema = new mongoose.Schema({
   chapter_id: { type: String, required: true },
   lesson_id: { type: String, required: true },
   knowledgeType: { type: String, required: true, },
+  difficulty: { type: String, required: true },
   question_id: { type: String, required: true },
   selected: { type: String, required: true },
   isCorrect: { type: Boolean, required: true },

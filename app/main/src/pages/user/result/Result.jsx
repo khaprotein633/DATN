@@ -167,7 +167,7 @@ const Result = () => {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold">
-              Kết quả bài thi
+              Kết quả
             </h1>
             <p className="text-gray-500 mt-1">
               Xem lại kết quả và đánh giá năng lực của bạn

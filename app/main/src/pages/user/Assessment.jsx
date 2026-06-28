@@ -336,12 +336,12 @@ const Assessment = () => {
                   {chapter.lessons.map((lesson) => (
                     <div key={lesson.lesson_name}>
                       <div className="flex justify-between mb-2">
-                       
+
                         <span>Bài {lesson.order}: {lesson.lesson_name}</span>
                         <div className="text-xs text-gray-500">
                           Độ chính xác: {lesson.mastery}% • {lesson.total} câu đã làm
                         </div>
-                        
+
                       </div>
 
                       <Progress
@@ -364,7 +364,7 @@ const Assessment = () => {
       </div>
       {/* Knowledge + Recommendation */}
       <Row gutter={[16, 16]} className="mt-4">
-        <Col xs={24} lg={8}>
+        <Col xs={24} lg={12}>
           <Card
             title="Đánh giá kiến thức"
             bordered={false}
@@ -401,8 +401,65 @@ const Assessment = () => {
             </div>
           </Card>
         </Col>
+        <Col xs={24} lg={12}>
+          <Card
+            title="Đánh giá theo độ khó"
+            bordered={false}
+            className="rounded-2xl shadow-sm"
+          >
 
-        <Col xs={24} lg={16}>
+            <div className="space-y-5">
+
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span>Câu dễ</span>
+
+                  <span className="font-semibold">
+                    {data.difficultyStats?.easy.total || 0} câu
+                  </span>
+                </div>
+
+                <Progress
+                  percent={data.difficultyStats?.easy.mastery || 0}
+                />
+              </div>
+
+
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span>Câu trung bình</span>
+
+                  <span className="font-semibold">
+                    {data.difficultyStats?.medium.total || 0} câu
+                  </span>
+                </div>
+
+                <Progress
+                  percent={data.difficultyStats?.medium.mastery || 0}
+                />
+              </div>
+
+
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span>Câu khó</span>
+
+                  <span className="font-semibold">
+                    {data.difficultyStats?.hard.total || 0} câu
+                  </span>
+                </div>
+
+                <Progress
+                  percent={data.difficultyStats?.hard.mastery || 0}
+                />
+              </div>
+
+
+            </div>
+
+          </Card>
+        </Col>
+        <Col xs={24} >
           <Card
             title="Khuyến nghị học tập"
             bordered={false}
