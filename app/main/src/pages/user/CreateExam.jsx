@@ -20,9 +20,11 @@ const CreateExam = () => {
     const navigate = useNavigate();
     const { user, authLoading } = useAuth();
     const [loading, setLoading] = useState(false);
+
     const [subjects, setSubjects] = useState([]);
     const [chapters, setChapters] = useState([]);
     const [lessons, setLessons] = useState({});
+
     const [difficulty, setDifficulty] = useState("");
     const [questionCount, setQuestionCount] = useState();
     const [duration, setDuration] = useState();
@@ -35,9 +37,10 @@ const CreateExam = () => {
             navigate("/auth/login");
             return;
         }
-        console.log("user:", user);
+        //console.log("user:", user);
         fetchAllSubject();
     }, [user]);
+
 
     const [form, setForm] = useState({
         user: user,
@@ -45,7 +48,7 @@ const CreateExam = () => {
         chapters: [],
         lessons: [],
         difficulty: "medium",
-        questionCount: 5,
+        questionCount: 20,
         duration: 15,
     });
 
@@ -55,30 +58,102 @@ const CreateExam = () => {
             setSubjects(data.list || []);
         } catch (err) {
             console.log(err);
+            toast.error(err.message || "Lấy danh sách môn học thất bại");
         }
     };
 
     const fetchChapters = async (subjectId) => {
         try {
             const data = await getChaperBySubject(subjectId);
+            console.log("Chapters:", data.list || []);
             setChapters(data.list || []);
         } catch (err) {
             console.log(err);
+            toast.error(err.message || "Lấy danh sách chương thất bại");
         }
     };
 
-    const fetchLessons = async (chapterId) => {
-        try {
-            const data = await getLessonByChapter(chapterId);
+    const loadLessons = async (chapterId) => {
+        if (lessons[chapterId]) return lessons[chapterId];
 
-            setLessons((prev) => ({
+        const data = await getLessonByChapter(chapterId);
+
+        setLessons(prev => ({
+            ...prev,
+            [chapterId]: data.list || [],
+        }));
+
+        return data.list || [];
+    };
+    
+    const handleChapterChange = async (chapter, checked) => {
+        if (checked) {
+            const lessonList = await loadLessons(chapter._id);
+
+            setForm(prev => ({
                 ...prev,
-                [chapterId]: data.list || [],
+                chapters: [...prev.chapters, chapter._id],
+                lessons: [
+                    ...new Set([
+                        ...prev.lessons,
+                        ...lessonList.map(l => l._id),
+                    ]),
+                ],
             }));
-        } catch (err) {
-            console.log(err);
+        } else {
+            const lessonIds =
+                lessons[chapter._id]?.map(l => l._id) || [];
+
+            setForm(prev => ({
+                ...prev,
+                chapters: prev.chapters.filter(id => id !== chapter._id),
+                lessons: prev.lessons.filter(id => !lessonIds.includes(id)),
+            }));
         }
     };
+
+    const handleSelectAll = async () => {
+        const allChapterIds = chapters.map(c => c._id);
+
+        let allLessons = [];
+        let lessonMap = {};
+
+        for (const chapter of chapters) {
+            const lessonList = await loadLessons(chapter._id);
+
+            lessonMap[chapter._id] = lessonList;
+
+            allLessons.push(...lessonList.map(l => l._id));
+        }
+
+        setLessons(prev => ({
+            ...prev,
+            ...lessonMap,
+        }));
+
+        setForm(prev => ({
+            ...prev,
+            chapters: allChapterIds,
+            lessons: allLessons,
+        }));
+    };
+
+    const totalQuestion = Object.values(lessons)
+        .flat()
+        .filter((lesson) => form.lessons.includes(lesson._id))
+        .reduce((sum, lesson) => sum + (lesson.questionCount || 0), 0);
+
+    const questionOptions = [20, 30, 40, 50].filter(
+        (item) => item <= totalQuestion
+    );
+    useEffect(() => {
+        if (
+            questionOptions.length > 0 &&
+            !questionOptions.includes(form.questionCount)
+        ) {
+            handleChange("questionCount", questionOptions[0]);
+        }
+    }, [totalQuestion]);
 
     const handleChange = (field, value) => {
         setForm((prev) => ({
@@ -87,11 +162,6 @@ const CreateExam = () => {
         }));
     };
 
-    // tính số câu hỏi / chương
-    const questionPerLesson = form.lessons.length > 0 ? (form.questionCount / form.lessons.length).toFixed(1) : 0;
-
-    const isInvalidQuestion = questionPerLesson < MIN_QUESTION_PER_LESSON;
-
     const handleCreate = async (e) => {
         e.preventDefault();
 
@@ -99,14 +169,6 @@ const CreateExam = () => {
 
         if (form.lessons.length === 0) { toast.error("Vui lòng chọn ít nhất 1 bài học"); return; }
 
-        if (isInvalidQuestion) { toast.error(`Mỗi bài học cần tối thiểu ${MIN_QUESTION_PER_LESSON} câu hỏi`); return; }
-
-        if (isInvalidQuestion) {
-            toast.error(
-                `Mỗi bài học cần tối thiểu ${MIN_QUESTION_PER_LESSON} câu hỏi`
-            );
-            return;
-        }
         try {
             setLoading(true);
             const data = await add(form);
@@ -121,6 +183,8 @@ const CreateExam = () => {
             setLoading(false);
         }
     }
+
+
 
     return (
         <div className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
@@ -188,37 +252,37 @@ const CreateExam = () => {
                                 <button
                                     type="button"
                                     className="text-sm bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl hover:bg-indigo-200"
-                                    onClick={async () => {
+                                    onClick={handleSelectAll}
+                                // onClick={async () => {
 
-                                        const allChapterIds = chapters.map(c => c._id);
+                                //     const allChapterIds = chapters.map(c => c._id);
 
-                                        let allLessons = [];
+                                //     let allLessons = [];
 
-                                        for (const chapter of chapters) {
+                                //     for (const chapter of chapters) {
 
-                                            const data = await getLessonByChapter(chapter._id);
+                                //         const data = await getLessonByChapter(chapter._id);
 
-                                            setLessons((prev) => ({
-                                                ...prev,
-                                                [chapter._id]: data.list || [],
-                                            }));
+                                //         setLessons((prev) => ({
+                                //             ...prev,
+                                //             [chapter._id]: data.list || [],
+                                //         }));
 
-                                            allLessons.push(
-                                                ...(data.list || []).map(l => l._id)
-                                            );
-                                        }
+                                //         allLessons.push(
+                                //             ...(data.list || []).map(l => l._id)
+                                //         );
+                                //     }
 
-                                        setForm((prev) => ({
-                                            ...prev,
-                                            chapters: allChapterIds,
-                                            lessons: allLessons,
-                                        }));
-                                    }}
+                                //     setForm((prev) => ({
+                                //         ...prev,
+                                //         chapters: allChapterIds,
+                                //         lessons: allLessons,
+                                //     }));
+                                // }}
                                 >
                                     Chọn tất cả
                                 </button>
                             </div>
-
 
                             <div className="space-y-4">
                                 {chapters.map((chapter) => (
@@ -231,59 +295,60 @@ const CreateExam = () => {
                                             <input
                                                 type="checkbox"
                                                 checked={form.chapters.includes(chapter._id)}
-                                                onChange={async (e) => {
+                                                onChange={(e) =>
+                                                    handleChapterChange(chapter, e.target.checked)
+                                                }
+                                            // onChange={async (e) => {
 
-                                                    if (e.target.checked) {
+                                            //     if (e.target.checked) {
 
-                                                        const data = await getLessonByChapter(chapter._id);
+                                            //         const data = await getLessonByChapter(chapter._id);
+                                            //         const lessonList = data.list || [];
+                                            //         setLessons((prev) => ({
+                                            //             ...prev,
+                                            //             [chapter._id]: lessonList,
+                                            //         }));
 
-                                                        const lessonList = data.list || [];
+                                            //         setForm((prev) => ({
 
-                                                        setLessons((prev) => ({
-                                                            ...prev,
-                                                            [chapter._id]: lessonList,
-                                                        }));
+                                            //             ...prev,
 
-                                                        setForm((prev) => ({
+                                            //             chapters: [
+                                            //                 ...prev.chapters,
+                                            //                 chapter._id
+                                            //             ],
 
-                                                            ...prev,
+                                            //             lessons: [
+                                            //                 ...new Set([
+                                            //                     ...prev.lessons,
+                                            //                     ...lessonList.map(l => l._id)
+                                            //                 ])
+                                            //             ]
+                                            //         }));
 
-                                                            chapters: [
-                                                                ...prev.chapters,
-                                                                chapter._id
-                                                            ],
+                                            //     } else {
 
-                                                            lessons: [
-                                                                ...new Set([
-                                                                    ...prev.lessons,
-                                                                    ...lessonList.map(l => l._id)
-                                                                ])
-                                                            ]
-                                                        }));
+                                            //         const lessonIds =
+                                            //             lessons[chapter._id]?.map(
+                                            //                 l => l._id
+                                            //             ) || [];
 
-                                                    } else {
+                                            //         setForm((prev) => ({
 
-                                                        const lessonIds =
-                                                            lessons[chapter._id]?.map(
-                                                                l => l._id
-                                                            ) || [];
+                                            //             ...prev,
 
-                                                        setForm((prev) => ({
+                                            //             chapters:
+                                            //                 prev.chapters.filter(
+                                            //                     c => c !== chapter._id
+                                            //                 ),
 
-                                                            ...prev,
-
-                                                            chapters:
-                                                                prev.chapters.filter(
-                                                                    c => c !== chapter._id
-                                                                ),
-
-                                                            lessons:
-                                                                prev.lessons.filter(
-                                                                    l => !lessonIds.includes(l)
-                                                                )
-                                                        }));
-                                                    }
-                                                }}
+                                            //             lessons:
+                                            //                 prev.lessons.filter(
+                                            //                     l => !lessonIds.includes(l)
+                                            //                 )
+                                            //         }));
+                                            //     }
+                                            // }}
                                             />
 
                                             <span className="font-medium text-slate-700">
@@ -367,24 +432,27 @@ const CreateExam = () => {
                             <select
                                 value={form.questionCount}
                                 onChange={(e) =>
-                                    handleChange(
-                                        "questionCount",
-                                        Number(e.target.value)
-                                    )
+                                    handleChange("questionCount", Number(e.target.value))
                                 }
                                 className="w-full border border-slate-200 rounded-xl px-4 py-3"
                             >
-                                <option value={5}>20 câu</option>
-                                <option value={30}>30 câu</option>
-                                <option value={40}>40 câu</option>
-                                <option value={50}>50 câu</option>
+                                {questionOptions.length > 0 ? (
+                                    questionOptions.map((item) => (
+                                        <option key={item} value={item}>
+                                            {item} câu
+                                        </option>
+                                    ))
+                                ) : (
+                                    <option value="">
+                                        - -
+                                    </option>
+                                )}
                             </select>
-                            <div className="mt-3 space-y-2">
+                            <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
 
-                                <div className="flex items-center justify-between text-sm">
-
+                                <div className="flex justify-between text-sm">
                                     <span className="text-slate-500">
-                                        Số bài học đã chọn
+                                        Bài học đã chọn
                                     </span>
 
                                     <span className="font-medium">
@@ -392,40 +460,33 @@ const CreateExam = () => {
                                     </span>
                                 </div>
 
-                                <div className="flex items-center justify-between text-sm">
-
+                                <div className="flex justify-between text-sm">
                                     <span className="text-slate-500">
-                                        Số câu mỗi bài
+                                        Tổng số câu hỏi
                                     </span>
 
-                                    <span
-                                        className={`font-medium ${isInvalidQuestion
-                                            ? "text-red-500"
-                                            : "text-emerald-600"
-                                            }`}
-                                    >
-                                        ≈ {questionPerLesson}
+                                    <span className="font-medium text-indigo-600">
+                                        {totalQuestion} câu
                                     </span>
                                 </div>
 
-                                {
-                                    isInvalidQuestion &&
-                                    form.lessons.length > 0 && (
-                                        <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-600">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-500">
+                                        Có thể tạo tối đa
+                                    </span>
 
-                                            Mỗi bài học nên có tối thiểu{" "}
-                                            {MIN_QUESTION_PER_LESSON} câu hỏi.
+                                    <span className="font-medium text-green-600">
+                                        {questionOptions.length > 0
+                                            ? `${Math.max(...questionOptions)} câu`
+                                            : "0 câu"}
+                                    </span>
+                                </div>
 
-                                            <br />
-
-                                            Hãy:
-                                            <ul className="list-disc ml-5 mt-2">
-                                                <li>Giảm số bài học</li>
-                                                <li>Hoặc tăng số lượng câu hỏi</li>
-                                            </ul>
-                                        </div>
-                                    )
-                                }
+                                {totalQuestion < 20 && (
+                                    <div className="mt-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-700">
+                                        Ngân hàng hiện có {totalQuestion} câu hỏi. Cần tối thiểu 20 câu để tạo đề.
+                                    </div>
+                                )}
                             </div>
                         </div>
 

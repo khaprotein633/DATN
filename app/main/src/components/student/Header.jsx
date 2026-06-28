@@ -1,8 +1,17 @@
-import { Menu, Bell, X } from "lucide-react";
-import { useState, useContext } from "react";
+import {
+  HomeOutlined,
+  BookOutlined,
+  FileTextOutlined,
+  BarChartOutlined,
+  HistoryOutlined,
+  UserOutlined,
+  MenuOutlined,
+} from "@ant-design/icons";
 
+import { Avatar, Button, Drawer } from "antd";
+import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { useNavigate, NavLink } from "react-router-dom";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
@@ -18,58 +27,75 @@ const Header = () => {
       .join("")
       .toUpperCase();
   };
-  
+
   const menus = [
     {
       name: "Trang chủ",
       path: "/student",
+      icon: <HomeOutlined />,
+      end: true,
     },
     {
       name: "Luyện tập",
       path: "/student/practice",
+      icon: <BookOutlined />,
     },
     {
       name: "Sinh đề",
       path: "/student/create/test",
+      icon: <FileTextOutlined />,
     },
     {
       name: "Đánh giá",
       path: "/student/assessment",
+      icon: <BarChartOutlined />,
     },
     {
       name: "Lịch sử",
       path: "/student/history",
-    }
-
+      icon: <HistoryOutlined />,
+    },
   ];
 
   return (
     <>
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto h-16 px-4 lg:px-8 flex items-center justify-between">
+      <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
 
           {/* Logo */}
           <NavLink
             to="/student"
             className="flex items-center gap-3"
           >
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-xl font-bold text-white shadow-md">
               Q
             </div>
 
-            <span className="font-bold text-slate-800">
-              QuizMaster
-            </span>
+            <div>
+              <p className="text-lg font-bold text-slate-800">
+                QuizMaster
+              </p>
+              <p className="text-xs text-slate-500">
+                Online Practice
+              </p>
+            </div>
           </NavLink>
 
-          {/* Desktop Menu */}
-          <nav className="hidden lg:flex gap-2">
+          {/* Desktop */}
+          <nav className="hidden items-center gap-2 lg:flex">
             {menus.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
-                className="px-4 py-2 rounded-xl hover:bg-slate-100"
+                end={item.end}
+                className={({ isActive }) =>
+                  `flex items-center gap-2 rounded-xl px-4 py-2 transition ${isActive
+                    ? "bg-blue-600 text-white"
+                    : "text-slate-600 hover:bg-slate-100"
+                  }`
+                }
               >
+                {item.icon}
                 {item.name}
               </NavLink>
             ))}
@@ -77,74 +103,55 @@ const Header = () => {
 
           {/* Right */}
           <div className="flex items-center gap-3">
-            
 
-            <div
-              onClick={() => {
-                if (!user) {
-                  navigate("/auth/login");
-                } else {
-                  navigate("/student/profile");
-                }
-              }}
-              className="cursor-pointer"
+            <Avatar
+              size={42}
+              className="cursor-pointer bg-gradient-to-r from-blue-500 to-indigo-500 transition hover:scale-105"
+              onClick={() =>
+                navigate(user ? "/student/profile" : "/auth/login")
+              }
             >
-              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white flex items-center justify-center font-semibold">
-                {user ? getInitials(user.name) : "?"}
-              </div>
-            </div>
+              {user ? getInitials(user.name) : <UserOutlined />}
+            </Avatar>
 
-            {/* Mobile Button */}
-            <button
-              onClick={() => setOpen(true)}
+            <Button
               className="lg:hidden"
-            >
-              <Menu size={26} />
-            </button>
+              type="text"
+              icon={<MenuOutlined />}
+              onClick={() => setOpen(true)}
+            />
           </div>
+
         </div>
       </header>
 
       {/* Mobile Drawer */}
-      <div
-        className={`fixed inset-0 z-[100] transition ${open ? "visible" : "invisible"
-          }`}
+      <Drawer
+        placement="right"
+        open={open}
+        width={300}
+        title="QuizMaster"
+        onClose={() => setOpen(false)}
       >
-        <div
-          className={`absolute inset-0 bg-black/40 ${open ? "opacity-100" : "opacity-0"
-            }`}
-          onClick={() => setOpen(false)}
-        />
-
-        <div
-          className={`absolute top-0 right-0 h-full w-[280px] bg-white transition-transform duration-300
-          ${open ? "translate-x-0" : "translate-x-full"
-            }`}
-        >
-          <div className="h-16 px-4 flex items-center justify-between border-b">
-            <span className="font-semibold">
-              Menu
-            </span>
-
-            <button onClick={() => setOpen(false)}>
-              <X />
-            </button>
-          </div>
-
-          <div className="p-4 space-y-2">
-            {menus.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onClick={() => setOpen(false)}
-                className="block px-4 py-3 rounded-xl hover:bg-slate-100"
-              >
-                {item.name}
-              </NavLink>
-            ))}
-          </div>
+        <div className="space-y-2">
+          {menus.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              onClick={() => setOpen(false)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-xl px-4 py-3 transition ${isActive
+                  ? "bg-blue-600 text-white"
+                  : "hover:bg-slate-100"
+                }`
+              }
+            >
+              {item.icon}
+              {item.name}
+            </NavLink>
+          ))}
         </div>
-      </div>
+      </Drawer>
     </>
   );
 };

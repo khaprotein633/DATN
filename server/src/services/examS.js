@@ -101,7 +101,6 @@ const getByUserId = async (user_id) => {
 
 const add = async (data) => {
 
-  console.log("data:", data);
   const name_subject = await subjectM.findById(data.subject);
    // Kiểm tra tổng số câu hiện có
   const totalAvailable = await Question.countDocuments({
@@ -225,7 +224,6 @@ const add = async (data) => {
     finalQuestions.sort(
       () => Math.random() - 0.5
     );  
-    console.log("finalQuestions", finalQuestions);
 
   const newtitle = "Đề thi môn: " + name_subject.name;
 

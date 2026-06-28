@@ -22,8 +22,8 @@ const getList = async (page = 1, limit = 10, search = "", chapter_id) => {
       },
     ];
   }
-  const totelLesson = await lessonM.countDocuments();
-  const totel = await lessonM.countDocuments(query);
+  const totalLesson = await lessonM.countDocuments();
+  const total = await lessonM.countDocuments(query);
 
   const lessons = await lessonM
     .find(query)
@@ -31,7 +31,7 @@ const getList = async (page = 1, limit = 10, search = "", chapter_id) => {
     .limit(limit);
 
   return {
-    totelLesson,
+    totalLesson,
     lessons,
     pagination: {
       page,
@@ -48,8 +48,16 @@ const getById = async (id) => {
 };
 
 const getByChapterId = async (chapter_id) => {
-  return await lessonM.find({ chapter_id });
-}
+  const lessons = await lessonM.find({ chapter_id }).lean();
+
+  for (const lesson of lessons) {
+    lesson.questionCount = await questionM.countDocuments({
+      lesson_id: lesson._id,
+    });
+  }
+
+  return lessons;
+};
 
 const add = async (data) => {
   const nameExists = await lessonM.findOne({

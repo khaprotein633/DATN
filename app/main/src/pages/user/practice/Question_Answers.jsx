@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import { useEffect, useState } from 'react'
 
 import {
     Card,
@@ -11,7 +11,15 @@ import {
     Tag,
     Divider,
     Spin,
+    Image
 } from "antd";
+import {
+    ArrowLeftOutlined,
+    BookOutlined,
+    ReadOutlined,
+    BulbOutlined,
+    CheckCircleFilled,
+} from "@ant-design/icons";
 import { toast } from "react-toastify";
 const { Sider, Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
@@ -77,6 +85,11 @@ const Question_Answers = () => {
         }
     };
 
+
+    const handleBack = () => {
+        navigate(-1);
+    }
+
     if (!subject) {
         return <Empty />;
     }
@@ -90,67 +103,150 @@ const Question_Answers = () => {
                 }}
             >
                 <Sider
-                    width={300}
+                    width={320}
                     theme="light"
                     style={{
-                        borderRight: "1px solid #f0f0f0",
+                        background: "#f8fafc",
                         padding: 20,
                         position: "sticky",
                         top: 20,
-                        height: "calc(100vh - 20px)",
+                        height: "calc(100vh - 40px)",
                         overflow: "auto",
+                        borderRadius: 20,
+                        boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
                     }}
                 >
-                    {/* Danh sách chương - bài */}
-                    <Title level={4}>
-                        Danh sách bài học
-                    </Title>
+                    <Button
+                        icon={<ArrowLeftOutlined />}
+                        onClick={handleBack}
+                        type="text"
+                        style={{
+                            marginBottom: 24,
+                            fontWeight: 600,
+                        }}
+                    >
+                        Quay lại
+                    </Button>
+
+                    <div
+                        style={{
+                            marginBottom: 24,
+                            padding: 18,
+                            borderRadius: 16,
+                            background:
+                                "linear-gradient(135deg,#1677ff,#69b1ff)",
+                            color: "#fff",
+                        }}
+                    >
+                        <Title
+                            level={4}
+                            style={{
+                                color: "#fff",
+                                marginBottom: 4,
+                            }}
+                        >
+                            Danh sách bài học
+                        </Title>
+
+                        <Text style={{ color: "rgba(255,255,255,.85)" }}>
+                            {chapters.length} chương
+                        </Text>
+                    </div>
 
                     <Collapse
                         accordion
                         ghost
+                        expandIconPosition="end"
                     >
+                        {chapters.map((chapter) => (
+                            <Panel
+                                key={chapter._id}
+                                header={
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: 10,
+                                            fontWeight: 600,
+                                        }}
+                                    >
+                                        <BookOutlined
+                                            style={{ color: "#1677ff" }}
+                                        />
+                                        <span>
+                                            {chapter.code}. {chapter.name}
+                                        </span>
+                                    </div>
+                                }
+                            >
+                                {chapter.lessons.map((lesson) => {
+                                    const active =
+                                        selectedLesson?._id === lesson._id;
 
-                        {
-                            chapters.map(chapter => (
-                                <Panel
-                                    header={`${chapter.code}. ${chapter.name}`}
-                                    key={chapter._id}
-                                >
-
-                                    {
-                                        chapter.lessons.map(lesson => (
-
-                                            <div
-                                                key={lesson._id}
+                                    return (
+                                        <div
+                                            key={lesson._id}
+                                            onClick={() =>
+                                                setSelectedLesson(lesson)
+                                            }
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: 12,
+                                                padding: "12px 14px",
+                                                marginBottom: 10,
+                                                borderRadius: 12,
+                                                cursor: "pointer",
+                                                transition: ".25s",
+                                                border: active
+                                                    ? "1px solid #1677ff"
+                                                    : "1px solid #f0f0f0",
+                                                background: active
+                                                    ? "#e6f4ff"
+                                                    : "#fff",
+                                                boxShadow: active
+                                                    ? "0 4px 12px rgba(22,119,255,.18)"
+                                                    : "0 2px 8px rgba(0,0,0,.04)",
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (!active) {
+                                                    e.currentTarget.style.background =
+                                                        "#fafafa";
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (!active) {
+                                                    e.currentTarget.style.background =
+                                                        "#fff";
+                                                }
+                                            }}
+                                        >
+                                            <ReadOutlined
                                                 style={{
-                                                    padding: "10px 12px",
-                                                    cursor: "pointer",
-                                                    borderRadius: 8,
-                                                    marginBottom: 8,
-                                                    background: selectedLesson?._id === lesson._id ? "#e6f4ff" : ""
+                                                    color: active
+                                                        ? "#1677ff"
+                                                        : "#999",
+                                                    fontSize: 18,
                                                 }}
-                                                onClick={() => setSelectedLesson(lesson)}
-                                            >
+                                            />
 
-                                                <Text strong>
-                                                 {lesson.name}
+                                            <div style={{ flex: 1 }}>
+                                                <Text
+                                                    strong={active}
+                                                    style={{
+                                                        color: active
+                                                            ? "#1677ff"
+                                                            : "#333",
+                                                    }}
+                                                >
+                                                    {lesson.name}
                                                 </Text>
-
-                                                <br />
-
-                                                {/* <Text type="secondary">
-                                                    {lesson.totalQuestions} câu hỏi
-                                                </Text> */}
-
                                             </div>
-
-                                        ))
-                                    }
-
-                                </Panel>
-                            ))
-                        }
+                                        </div>
+                                    );
+                                })}
+                            </Panel>
+                        ))}
                     </Collapse>
                 </Sider>
 
@@ -170,75 +266,81 @@ const Question_Answers = () => {
                     </Text>
 
                     <Divider />
-                    {
-                        questions.map((item, index) => (
-
-                            <Card
-                                key={item._id}
-                                style={{
-                                    marginBottom: 20,
-                                    borderRadius: 12
-                                }}
-                            >
-
-                                <Title level={5}>
-                                    Câu {index + 1}. {item.content}
-                                </Title>
-
-                                {
-                                    item.options.map((op, i) => (
-
-                                        <div
-                                            key={i}
-                                            style={{
-                                                padding: "8px 0"
-                                            }}
-                                        >
-
-                                            {String.fromCharCode(65 + i)}. {op.content}
-
-                                        </div>
-
-                                    ))
-                                }
-
-                                <Collapse
-                                    ghost
-                                    style={{ marginTop: 15 }}
+                    {questions.map((item, index) => (
+                        <Card
+                            key={item._id}
+                            style={{
+                                marginBottom: 20,
+                                borderRadius: 12
+                            }}
+                        >
+                            <Title level={5}>
+                                Câu {index + 1}. {item.content}
+                            </Title>
+                            {item.image && (
+                                <div
+                                    style={{
+                                        textAlign: "center",
+                                        margin: "20px 0",
+                                    }}
                                 >
+                                    <Image
+                                        src={item.image}
+                                        alt="Hình minh họa"
+                                        style={{
+                                            maxWidth: "100%",
+                                            maxHeight: 300,
+                                            borderRadius: 4,
+                                        }}
+                                    />
+                                </div>
+                            )}
+                            {item.options.map((op, i) => (
+                                <div key={i} style={{ padding: "8px 0" }}>
+                                    {String.fromCharCode(65 + i)}. {op.text}
+                                </div>
+                            ))
+                            }
+                            <Collapse
+                                ghost
+                                className="mt-4 rounded-xl bg-white"
+                                items={[
+                                    {
+                                        key: "1",
+                                        label: (
+                                            <div className="flex items-center gap-2 font-semibold text-blue-600">
+                                                <BulbOutlined />
+                                                <span>Xem đáp án & giải thích</span>
+                                            </div>
+                                        ),
+                                        children: (
+                                            <div className="space-y-4">
+                                                <div className="inline-flex items-center gap-2 rounded-lg bg-green-50 px-4 py-2 border border-green-200">
+                                                    <CheckCircleFilled className="text-green-600" />
+                                                    <span className="font-medium">
+                                                        Đáp án đúng:
+                                                    </span>
+                                                    <Tag color="success" className="m-0">
+                                                        {item.correctAnswer}
+                                                    </Tag>
+                                                </div>
 
-                                    <Panel
-                                        header={
-                                            <Button type="link">
-                                                Xem đáp án & giải thích
-                                            </Button>
-                                        }
-                                        key="1"
-                                    >
+                                                <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                                                    <p className="mb-2 font-semibold text-gray-700">
+                                                        Giải thích
+                                                    </p>
 
-                                        <Tag color="green">
-                                            Đáp án đúng:
-                                            {" "}
-                                            {item.correctAnswer}
-                                        </Tag>
-
-                                        <Paragraph
-                                            style={{
-                                                marginTop: 15
-                                            }}
-                                        >
-
-                                            {item.explanation}
-
-                                        </Paragraph>
-
-                                    </Panel>
-
-                                </Collapse>
-
-                            </Card>
-
-                        ))
+                                                    <Paragraph className="!mb-0 text-gray-600">
+                                                        {item.explanation}
+                                                    </Paragraph>
+                                                </div>
+                                            </div>
+                                        ),
+                                    },
+                                ]}
+                            />
+                        </Card>
+                    ))
                     }
                 </Content>
             </Layout>
