@@ -51,6 +51,8 @@ const Result = () => {
   const [viewMode, setViewMode] = useState("chapter");
 
 
+
+
   useEffect(() => {
     const fetchResult = async () => {
       try {
@@ -93,7 +95,17 @@ const Result = () => {
     "#9ca3af"
   ];
 
+  const chunkSize = 20;
 
+  const chunkArray = (arr, size) => {
+    const result = [];
+    for (let i = 0; i < arr.length; i += size) {
+      result.push(arr.slice(i, i + size));
+    }
+    return result;
+  };
+
+  const colorChunks = chunkArray(COLORS, chunkSize);
   const handleReturnHome = () => {
     navigate("/student/home");
   }
@@ -422,11 +434,16 @@ const Result = () => {
                             </div>
 
                             <Progress
-                              percent={100}
-                              steps={item.total}
-                              showInfo={false}
-                              strokeColor={colors}
+                              percent={Math.round((item.correct / item.total) * 100)}
+                              strokeColor={
+                                item.correct / item.total >= 0.8
+                                  ? "#52c41a"
+                                  : item.correct / item.total >= 0.5
+                                    ? "#faad14"
+                                    : "#ff4d4f"
+                              }
                             />
+
                             <span className="font-semibold text m-3">
                               {item.percentage}%
                             </span>
@@ -487,10 +504,14 @@ const Result = () => {
                               </div>
 
                               <Progress
-                                percent={100}
-                                steps={item.total}
-                                showInfo={false}
-                                strokeColor={colors}
+                                percent={Math.round((item.correct / item.total) * 100)}
+                                strokeColor={
+                                  item.correct / item.total >= 0.8
+                                    ? "#52c41a"
+                                    : item.correct / item.total >= 0.5
+                                      ? "#faad14"
+                                      : "#ff4d4f"
+                                }
                               />
                               <p
                                 className={`mt-2 text-sm 
