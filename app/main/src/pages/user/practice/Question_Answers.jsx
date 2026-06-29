@@ -321,7 +321,7 @@ const Question_Answers = () => {
                                                         Đáp án đúng:
                                                     </span>
                                                     <Tag color="success" className="m-0">
-                                                        {item.correctAnswer}
+                                                        {item.options.find(option => option.isCorrect)?.text}
                                                     </Tag>
                                                 </div>
 

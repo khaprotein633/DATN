@@ -18,7 +18,8 @@ import {
   TrophyOutlined,
   RobotOutlined,
   RightOutlined,
-  CheckCircleOutlined
+  CheckCircleOutlined,
+  FireTwoTone
 } from "@ant-design/icons";
 
 import { useNavigate } from "react-router-dom";
@@ -110,120 +111,108 @@ const Home = () => {
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       {/* HERO */}
-      <Card
-        bordered={false}
-        className="overflow-hidden"
-        bodyStyle={{
-          padding: 0
-        }}
-      >
-        <div className=" p-8 text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl " >
-          <Row
-            align="middle"
-            justify="space-between"
-            gutter={[32, 32]}
-          >
-            <Col xs={24} lg={14}>
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 p-10 text-white shadow-xl">
+        <div className="max-w-2xl">
+          <h1 className="text-4xl font-bold">
+            Xin chào {user?.fullName || "bạn"} <FireTwoTone />
+          </h1>
 
-              <h1 className="text-4xl font-bold mb-3">
-                Xin chào 👋
-              </h1>
-              <p className="text-lg opacity-90">
-                Tiếp tục luyện tập và cải thiện
-                năng lực học tập của bạn
-              </p>
+          <p className="mt-3 text-lg text-blue-100">
+            Tiếp tục hành trình học tập và nâng cao năng lực của bạn.
+          </p>
 
-              <div className="mt-6 flex gap-3">
-                <Button
-                  size="large"
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={() => navigate("/student/create/test")}
-                >
-                  Làm bài mới
-                </Button>
-                <Button
-                  size="large"
-                  ghost
-                  icon={<BarChartOutlined />}
-                  onClick={() => navigate("/student/assessment")}
-                >
-                  Xem đánh giá
-                </Button>
-              </div>
-            </Col>
-            <Col xs={24} lg={8}>
-              <Card className="shadow-lg" >
-                <Row gutter={[16, 16]}>
-                  <Col span={12}>
-                    <Statistic
-                      title="Môn học"
-                      value={overview.totalSubjects}
-                    />
-                  </Col>
-                  <Col span={12}>
-                    <Statistic
-                      title="Câu hỏi"
-                      value={overview.totalQuestions}
-                    />
-                  </Col>
-                  {/* <Col span={12}>
-                    <Statistic
-                      title="Đề trắc nghiệm"
-                      value={overview.totalExams}
-                    />
-                  </Col> */}
-                  <Col span={12}>
-                    <Statistic
-                      title="Lượt làm"
-                      value={overview.totalresults}
-                    />
-                  </Col>
-                </Row>
-              </Card>
-            </Col>
-          </Row>
+          <div className="mt-8 flex flex-wrap gap-4">
+            <Button
+              type="primary"
+              size="large"
+              icon={<PlusOutlined />}
+              onClick={() => navigate("/student/create/test")}
+            >
+              Làm bài ngay
+            </Button>
+
+            <Button
+              size="large"
+              ghost
+              onClick={() => navigate("/student/practice")}
+            >
+              Luyện tập
+            </Button>
+
+            <Button
+              size="large"
+              ghost
+              icon={<BarChartOutlined />}
+              onClick={() => navigate("/student/assessment")}
+            >
+              Đánh giá
+            </Button>
+          </div>
         </div>
-      </Card>
+      </div>
       {/* SUBJECT */}
       <div>
-        <div className="flex justify-between items-center mb-4">
+
+        <div className="flex justify-between items-center mb-5">
           <h2 className="text-2xl font-bold">
-            Môn học
+            Khám phá môn học
           </h2>
-          <Button type="link" onClick={() => navigate("/student/practice")}>
+
+          <Button
+            type="link"
+            onClick={() => navigate("/student/practice")}
+          >
             Xem tất cả →
           </Button>
         </div>
-        <Row gutter={[16, 16]}>
-          {subjects.map(subject => (
-            <Col xs={24} sm={12} lg={6} key={subject.name} >
+
+        <Row gutter={[20, 20]}>
+          {subjects.map((subject) => (
+            <Col
+              xs={24}
+              sm={12}
+              lg={8}
+              xl={6}
+              key={subject._id}
+            >
               <Card
                 hoverable
-                className="text-center h-full"
+                className="rounded-3xl h-full border-0 shadow-md hover:shadow-xl transition-all"
+                bodyStyle={{ height: "100%" }}
               >
-                <div className="text-4xl mb-3">
-                  {subject.icon}
+                <div className="flex flex-col h-full">
+                  <div className="text-5xl mb-5">
+                    {subject.icon}
+                  </div>
+
+                  <h3 className="text-xl font-semibold line-clamp-2 min-h-[56px]">
+                    {subject.name}
+                  </h3>
+
+                  <p className="text-gray-500 mt-2">
+                    {subject.totalQuestion} câu hỏi
+                  </p>
+
+                  <div className="mt-auto pt-5">
+                    <Button
+                      block
+                      type="primary"
+                      shape="round"
+                      onClick={() => navigate(`/student/practice/subject/${subject._id}`)}
+                    >
+                      Xem
+                    </Button>
+                  </div>
                 </div>
-                <h3 className="font-semibold text-lg">
-                  {subject.name}
-                </h3>
-                <p className="text-gray-500">
-                  {subject.totalQuestion} câu hỏi
-                </p>
-                <Button
-                  type="link"
-                  onClick={() => navigate("/student/create/test")}
-                >
-                  Làm bài →
-                </Button>
               </Card>
+
             </Col>
-          ))
-          }
+
+          ))}
         </Row>
+
       </div>
-      {/* STATISTIC */}
+     
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
           <Card
@@ -239,9 +228,7 @@ const Home = () => {
                     <span className="font-medium">
                       {item.subject_name}
                     </span>
-                    <span>
-                      {item.accuracy}%
-                    </span>
+                    
                   </div>
                   <Progress percent={item.accuracy} />
                 </div>
@@ -254,67 +241,67 @@ const Home = () => {
           </Card>
         </Col>
 
-       <Col xs={24} lg={12}>
-  <Card title="Tổng quan cá nhân">
-    <Row gutter={[16,16]}>
+        <Col xs={24} lg={12}>
+          <Card title="Tổng quan cá nhân">
+            <Row gutter={[16, 16]}>
 
-      <Col span={12}>
-        <Statistic
-          title="Bài đã làm"
-          value={quickAssessment?.totalExam ?? "-"}
-          prefix={<FileTextOutlined style={{fontSize:20}} />}
-          valueStyle={{fontSize:24}}
-        />
-      </Col>
+              <Col span={12}>
+                <Statistic
+                  title="Bài đã làm"
+                  value={quickAssessment?.totalExam ?? "-"}
+                  prefix={<FileTextOutlined style={{ fontSize: 20 }} />}
+                  valueStyle={{ fontSize: 24 }}
+                />
+              </Col>
 
-      <Col span={12}>
-        <Statistic
-          title="Điểm TB"
-          value={quickAssessment?.avgScore ?? "-"}
-          prefix={<TrophyOutlined style={{fontSize:20}} />}
-          valueStyle={{fontSize:24}}
-        />
-      </Col>
+              <Col span={12}>
+                <Statistic
+                  title="Điểm TB"
+                  value={quickAssessment?.avgScore ?? "-"}
+                  prefix={<TrophyOutlined style={{ fontSize: 20 }} />}
+                  valueStyle={{ fontSize: 24 }}
+                />
+              </Col>
 
-      <Col span={12}>
-        <Statistic
-          title="Chính xác"
-          value={quickAssessment?.accuracy ?? "-"}
-          suffix="%"
-          prefix={<CheckCircleOutlined style={{fontSize:20}} />}
-          valueStyle={{fontSize:24}}
-        />
-      </Col>
+              <Col span={12}>
+                <Statistic
+                  title="Chính xác"
+                  value={quickAssessment?.accuracy ?? "-"}
+                  suffix="%"
+                  prefix={<CheckCircleOutlined style={{ fontSize: 20 }} />}
+                  valueStyle={{ fontSize: 24 }}
+                />
+              </Col>
 
-      <Col span={12}>
-        <div>
-          <p className="text-gray-500 mb-2">
-            Môn nổi bật
-          </p>
+              <Col span={12}>
+                <div>
+                  <p className="text-gray-500 mb-2">
+                    Môn nổi bật
+                  </p>
 
-          <div className="flex items-center gap-2 text-xl font-medium">
-            <BookOutlined style={{fontSize:20}} />
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <BookOutlined style={{ fontSize: 20 }} />
 
-            <span
-              className="truncate max-w-[180px]"
-              title={quickAssessment?.favoriteSubject?.name}
-            >
-              {quickAssessment?.favoriteSubject?.name ?? "-"}
-            </span>
-          </div>
-        </div>
-      </Col>
+                    <span
+                      className="truncate"
+                      title={quickAssessment?.favoriteSubject?.name}
+                    >
+                      {quickAssessment?.favoriteSubject?.name ?? "-"}
+                    </span>
+                  </div>
+                </div>
+              </Col>
 
-    </Row>
-  </Card>
-</Col>
+            </Row>
+          </Card>
+        </Col>
       </Row>
 
-      {/* RECENT */}
+     
       <Card
         title="Lịch sử gần đây"
         extra={
-          <Button  onClick={() => navigate("/student/history")}>
+          <Button onClick={() => navigate("/student/history")}>
             Xem tất cả →
           </Button>
         }

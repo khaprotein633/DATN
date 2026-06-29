@@ -13,6 +13,7 @@ import {
   MessageOutlined,
   UserOutlined,
   RobotOutlined,
+  SendOutlined
 } from "@ant-design/icons";
 
 import {
@@ -115,161 +116,272 @@ const Chatbox = () => {
       setLoading(false);
     }
   };
+return (
+  <>
+    <FloatButton
+      icon={<MessageOutlined style={{ fontSize: 28 }} />}
+      type="primary"
+      onClick={() => setOpen(true)}
+      style={{
+        width: 60,
+        height: 60,
+        right: 30,
+        bottom: 30,
+        boxShadow: "0 8px 25px rgba(37,99,235,.35)"
+      }}
+    />
 
-  return (
-    <>
-      <div className="">
-        <FloatButton
-          icon={<MessageOutlined style={{ fontSize: 40 }} />}
-          type="primary"
-          onClick={() => setOpen(true)}
-          style={{
-            width: 65,
-            height: 65,
-            right: 30,
-            bottom: 30,
-          }}
-        />
-      </div>
-      <Drawer
-        title={
-          <div className="flex items-center gap-3">
-            <Avatar
-              size={40}
-              icon={<RobotOutlined />}
-            />
-            <div>
-              <div className="font-semibold">
-                Trợ lý học tập DSA
+
+    <Drawer
+      placement="right"
+      width={430}
+      open={open}
+      onClose={() => setOpen(false)}
+      closable={false}
+      styles={{
+        body: {
+          padding: 0
+        }
+      }}
+
+      title={
+        <div className="
+          flex 
+          items-center 
+          gap-3 
+          -mx-2
+        ">
+          <div className="
+            w-11 h-11
+            rounded-full
+            bg-gradient-to-br
+            from-indigo-500
+            to-blue-600
+            flex
+            items-center
+            justify-center
+            text-white
+          ">
+            <RobotOutlined className="text-xl"/>
+          </div>
+
+
+          <div>
+            <div className="font-semibold text-base ">
+              Trợ lý học tập
+            </div>
+
+            <div className=" text-xs  text-green-500 flex items-center gap-1 ">
+              <span className="
+                w-2 h-2 
+                rounded-full
+                bg-green-500
+              " />
+              AI đang hoạt động
+            </div>
+
+          </div>
+        </div>
+      }
+    >
+
+
+      <div className="
+        flex
+        flex-col
+        h-[calc(100vh-130px)]
+        bg-gray-50
+      ">
+
+
+        {/* MESSAGE AREA */}
+
+        <div className="
+          flex-1
+          overflow-y-auto
+          px-4
+          py-5
+          space-y-4
+        ">
+
+
+          {messages.map((msg,index)=>(
+            <div
+              key={index}
+              className={`
+                flex
+                gap-2
+                ${
+                  msg.sender==="user"
+                  ? "justify-end"
+                  :"justify-start"
+                }
+              `}
+            >
+
+
+              {
+                msg.sender !== "user" &&
+
+                <div className="
+                  w-8 h-8
+                  rounded-full
+                  bg-indigo-600
+                  flex
+                  items-center
+                  justify-center
+                  text-white
+                  flex-shrink-0
+                ">
+                  <RobotOutlined/>
+                </div>
+
+              }
+
+
+
+              <div
+                className={`max-w-[78%] px-4 py-3 rounded-3xl text-[14px] leading-6 shadow-sm whitespace-pre-wrap
+                  ${msg.sender==="user"
+                    ?
+                    `
+                    bg-blue-600
+                    text-white
+                    rounded-br-md
+                    `
+                    :
+                    `
+                    bg-white
+                    text-gray-700
+                    rounded-bl-md
+                    border
+                    border-gray-100
+                    `
+                  }
+                `}
+              >
+
+                {msg.text}
+
               </div>
-              <div className="text-xs text-gray-500">
-                AI Learning Assistant
+              {msg.sender==="user" &&
+                <div className=" w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white flex-shrink-0 ">
+                  <UserOutlined/>
+                </div>
+              }
+            </div>
+          ))}
+          {loading &&  <div className=" flex gap-2 items-center ">
+              <div className="
+                w-8 h-8
+                rounded-full
+                bg-indigo-600
+                flex
+                items-center
+                justify-center
+                text-white
+              ">
+                <RobotOutlined/>
+              </div>
+              <div className="
+                bg-white
+                px-4
+                py-3
+                rounded-3xl
+                border
+              ">
+                <Spin size="small"/>
               </div>
             </div>
-          </div>
-        }
-        placement="right"
-        width={450}
-        onClose={() => setOpen(false)}
-        open={open}
-      >
-        <div className="flex flex-col h-[calc(100vh-180px)]">
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto pr-2">
-            {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`flex mb-4 ${msg.sender === "user"
-                  ? "justify-end"
-                  : "justify-start"
-                  }`}
+          }
+        </div>
+        <div className="
+          px-4
+          pb-2
+          flex
+          gap-2
+          overflow-x-auto
+        ">
+          {[
+              "Stack là gì?",
+              "Queue là gì?",
+              "Quick Sort?"
+            ].map((item)=>(
+
+              <Button
+
+                key={item}
+
+                size="small"
+
+                className="
+                  rounded-full
+                  bg-white
+                  border-gray-200
+                  hover:border-blue-500
+                "
+
+                onClick={()=>setInput(item)}
+
               >
-                <div
-                  className={`flex gap-2 max-w-[85%] ${msg.sender === "user"
-                    ? "flex-row-reverse"
-                    : ""
-                    }`}
-                >
-                  <Avatar
-                    icon={
-                      msg.sender === "user" ? (
-                        <UserOutlined />
-                      ) : (
-                        <RobotOutlined />
-                      )
-                    }
-                  />
+                {item}
 
-                  <div
-                    className={`px-4 py-2 rounded-xl ${msg.sender === "user"
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-100"
-                      }`}
-                  >
-                    <Text
-                      style={{
-                        color:
-                          msg.sender === "user"
-                            ? "white"
-                            : "black",
-                      }}
-                    >
-                      {msg.text}
-                    </Text>
-                  </div>
-                </div>
-              </div>
-            ))}
+              </Button>
 
-            {loading && (
-              <div className="flex gap-2 items-center">
-                <Avatar icon={<RobotOutlined />} />
-                <div className="bg-gray-100 px-4 py-2 rounded-xl">
-                  <Spin size="small" />
-                </div>
-              </div>
-            )}
-          </div>
+            ))
+          }
+        </div>
 
-          {/* Quick Suggestions */}
-          <div className="flex gap-2 my-3 flex-wrap">
-            <Button
-              size="small"
-              onClick={() =>
-                setInput("Giải thích Stack là gì?")
-              }
-            >
-              Stack
-            </Button>
+        {/* INPUT */}
 
-            <Button
-              size="small"
-              onClick={() =>
-                setInput("Giải thích Queue là gì?")
-              }
-            >
-              Queue
-            </Button>
-
-            <Button
-              size="small"
-              onClick={() =>
-                setInput("Độ phức tạp của Quick Sort?")
-              }
-            >
-              Quick Sort
-            </Button>
-          </div>
-
-          {/* Input */}
-          <div className="border-t pt-3">
+        <div className="
+          bg-white
+          border-t
+          px-4
+          py-3
+        ">
+          <div className="
+            flex
+            gap-2
+            items-end
+          ">
             <TextArea
-              rows={3}
               value={input}
-              placeholder="Nhập câu hỏi..."
-              onChange={(e) => setInput(e.target.value)}
-              onPressEnter={(e) => {
-                if (!e.shiftKey) {
+              onChange={(e)=>setInput(e.target.value)}
+              placeholder="Hỏi trợ lý học tập..."
+              autoSize={{
+                minRows:1,
+                maxRows:4
+              }}
+              className="rounded-2xl"
+              onPressEnter={(e)=>{
+                if(!e.shiftKey){
                   e.preventDefault();
                   handleSend();
                 }
               }}
             />
-
             <Button
               type="primary"
-              block
-              className="mt-2"
-              onClick={handleSend}
+              shape="circle"
+              size="large"
               loading={loading}
-            >
-              Gửi câu hỏi
-            </Button>
+              icon={<SendOutlined/>}
+              onClick={handleSend}
+            />
           </div>
+         
         </div>
-      </Drawer>
-    </>
-  );
+
+
+      </div>
+
+
+
+    </Drawer>
+
+  </>
+);
 };
 
 export default Chatbox;
