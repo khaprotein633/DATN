@@ -85,7 +85,7 @@ const CreateExam = () => {
 
         return data.list || [];
     };
-    
+
     const handleChapterChange = async (chapter, checked) => {
         if (checked) {
             const lessonList = await loadLessons(chapter._id);
@@ -417,6 +417,7 @@ const CreateExam = () => {
                                 }
                                 className="w-full border border-slate-200 rounded-xl px-4 py-3"
                             >
+                                <option value={"all"}>Tất cả</option>
                                 <option value={"easy"}>Dễ</option>
                                 <option value={"medium"}>Trung bình</option>
                                 <option value={"hard"}>Khó</option>
@@ -526,7 +527,7 @@ const CreateExam = () => {
                 {/* Preview */}
                 <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm h-fit">
                     <h2 className="font-semibold text-lg mb-6">
-                        Thông tin đề 
+                        Thông tin đề
                     </h2>
 
                     <div className="space-y-5">

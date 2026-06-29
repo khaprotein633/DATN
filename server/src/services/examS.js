@@ -104,7 +104,7 @@ const getByUserId = async (user_id) => {
 const add = async (data) => {
 
   const name_subject = await subjectM.findById(data.subject);
-   // Kiểm tra tổng số câu hiện có
+  // Kiểm tra tổng số câu hiện có
   const totalAvailable = await Question.countDocuments({
     lesson_id: { $in: data.lessons }
   });
@@ -122,6 +122,11 @@ const add = async (data) => {
 
   // Difficulty config
   const difficultyConfig = {
+    all: {
+      easy: 0.4,
+      medium: 0.3,
+      hard: 0.3,
+    },
     easy: {
       easy: 0.6,
       medium: 0.3,
@@ -142,7 +147,7 @@ const add = async (data) => {
   };
 
   // difficulty user chọn
-  const selectedDifficulty =difficultyConfig[data.difficulty];
+  const selectedDifficulty = difficultyConfig[data.difficulty];
 
   let finalQuestions = [];
   // Loop từng lesson
@@ -221,7 +226,7 @@ const add = async (data) => {
   finalQuestions =
     finalQuestions.sort(
       () => Math.random() - 0.5
-    );  
+    );
 
   const newtitle = "Đề thi môn: " + name_subject.name;
 
