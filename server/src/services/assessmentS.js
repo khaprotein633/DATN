@@ -39,10 +39,8 @@ const getBySubjectId = async (subject_id, user_id) => {
         }
         return false;
     });
-    const assessmentResults = validResults.slice(0, 15);
+    const assessmentResults = validResults.slice(0, 10);
     const historyResults = validResults;
-
-
 
     // Thống kê tổng thể theo môn học
     const totalExams = await examM.countDocuments({
@@ -226,19 +224,24 @@ const getBySubjectId = async (subject_id, user_id) => {
 
     const strongCount = strongest.length;
     const weakCount = weaknesses.length;
+
     let summary = "";
 
-    if (weakCount === 0) {
+    if (avgScore >= 7.5) {
         summary =
-            "Bạn đang có mức độ thành thạo tốt ở hầu hết các chương kiến thức trong môn học.";
+            "Bạn đang có kết quả học tập tốt, cho thấy khả năng nắm vững kiến thức trong môn học.";
     }
-    else if (weakCount <= 2) {
+    else if (avgScore >= 6.5) {
         summary =
-            "Bạn có nền tảng kiến thức khá tốt nhưng vẫn còn một số nội dung cần được củng cố thêm.";
+            "Bạn có kết quả học tập khá, tuy nhiên vẫn cần củng cố thêm một số kiến thức để nâng cao kết quả.";
+    }
+    else if (avgScore >= 5) {
+        summary =
+            "Kết quả học tập của bạn đang ở mức trung bình, cần tiếp tục ôn tập để cải thiện khả năng nắm bắt kiến thức.";
     }
     else {
         summary =
-            "Bạn cần dành thêm thời gian ôn tập các chương kiến thức trọng tâm để cải thiện kết quả học tập.";
+            "Kết quả học tập của bạn còn hạn chế, cần tập trung củng cố lại các kiến thức nền tảng.";
     }
 
     return {
