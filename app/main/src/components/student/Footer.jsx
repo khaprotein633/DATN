@@ -5,13 +5,11 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-2">
           
           <p className="text-sm text-slate-500 text-center md:text-left">
-            © 2026 QuizMaster
+            {/* QuizMaster */}
           </p>
 
           <div className="flex gap-4 text-sm text-slate-500">
-            <span>Privacy</span>
-            <span>Support</span>
-            <span>Version 1.0.0</span>
+        
           </div>
 
         </div>

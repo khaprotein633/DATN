@@ -73,6 +73,7 @@ const Assessment = () => {
       setLoading(false)
     }
   };
+  console.log("data:", data);
 
   useEffect(() => {
     if (!selectedSubject) return;
@@ -109,7 +110,7 @@ const Assessment = () => {
             </h1>
 
             <p className="text-slate-500 mt-2">
-              Phân tích kết quả từ các bài thi đã thực hiện
+              Phân tích kết quả từ các kết quả gần nhất
             </p>
           </div>
 
@@ -215,7 +216,7 @@ const Assessment = () => {
             </h2>
 
             <p className="text-sm text-slate-500">
-              Tổng hợp từ các bài thi đã thực hiện
+              Tổng hợp từ các 15 kết quả gần nhất của bạn trong môn học này
             </p>
           </div>
         </div>

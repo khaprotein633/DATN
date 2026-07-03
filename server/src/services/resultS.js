@@ -249,23 +249,15 @@ const getById = async (id) => {
 
   const questionMap = new Map(exam.questions.map((q) => [q.question_id.toString(), q]));
 
-  const chapterIds = [
-    ...new Set(
-      exam.questions.map(q => q.chapter_id)
-    )
-  ];
+  const chapterIds = [...new Set( exam.questions.map(q => q.chapter_id))];
 
-  const lessonIds = [
-    ...new Set(
-      exam.questions.map(q => q.lesson_id)
-    )
-  ];
+  const lessonIds = [ ...new Set(exam.questions.map(q => q.lesson_id))];
 
-  const chapters = await chapterM.find({ _id: { $in: chapterIds } });
+  const chapters = await chapterM.find({ _id: { $in: chapterIds } }).sort({ order: 1 });
 
   const lessons = await lessonM.find({ _id: { $in: lessonIds } });
 
-  const chapterMap = new Map(chapters.map(c => [c._id.toString(), c.name]));
+  const chapterMap = new Map(chapters.map(c => [c._id.toString(), { name: c.name, order: c.order }]));
 
   const lessonMap = new Map(lessons.map(l => [l._id.toString(), l.name]));
 
@@ -279,7 +271,10 @@ const getById = async (id) => {
   const answerDetails = result.answers.map((answer) => {
     const question = questionMap.get(answer.question_id.toString());
 
-    const chaptername = chapterMap.get(question.chapter_id)
+    const chapterData = chapterMap.get(question.chapter_id);
+    const chaptername =  chapterData.name;
+    const chapterorder = chapterData.order;
+    console.log("chapterData:", chapterData);
     const lessonname = lessonMap.get(question.lesson_id)
 
 
@@ -309,6 +304,7 @@ const getById = async (id) => {
       lesson_name: lessonname,
 
       knowledgeType: question.knowledgeType,
+      chapter_order: chapterorder,
 
       user_answer: answer.selected,
       user_answer_content: selectedOption?.text || null,
@@ -351,13 +347,13 @@ const getById = async (id) => {
     (unansweredCount / totalQuestions) * 100
   );
 
-  // tính tổng hợp để đưa ra kết quả 
   //đánh giá theo chương
   const chapterStats = {};
   answerDetails.forEach((item) => {
     if (!chapterStats[item.chapter_name]) {
       chapterStats[item.chapter_name] = {
         chapter_name: item.chapter_name,
+        chapter_order: item.chapter_order,
         total: 0,
         wrong: 0,
         skipped: 0,
@@ -379,8 +375,9 @@ const getById = async (id) => {
       percentage: Math.round(
         (item.correct / item.total) * 100
       ),
-    }));
+    })).sort((a, b) => a.chapter_order - b.chapter_order);
 
+   // console.log("chapterStatsArray:", chapterStatsArray);
   /// đánh giá theo bài
   const lessonStats = {};
   answerDetails.forEach((item) => {

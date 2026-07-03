@@ -21,7 +21,7 @@ const ProgressChart = ({ data = [] }) => {
   }
 
   return (
-    <Card title="Tiến độ học tập theo thời gian">
+    <Card title="Tiến độ học tập 15 kết quả gần nhất">
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />

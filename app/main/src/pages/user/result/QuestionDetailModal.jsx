@@ -111,7 +111,6 @@ const QuestionDetailModal = ({
           </p>
 
         </div>
-
         {/* Result */}
         <div
           className={`
@@ -124,10 +123,10 @@ const QuestionDetailModal = ({
           `}
         >
           {question.is_correct
-            ? "✓ Bạn đã trả lời đúng"
-            : "✗ Bạn đã trả lời sai"}
+            ? "Bạn đã trả lời đúng"
+            : "Bạn đã trả lời sai"}
         </div>
-
+           
       </div>
     </Modal>
   );

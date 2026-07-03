@@ -110,9 +110,7 @@ const add = async (data) => {
   });
 
   if (data.questionCount > totalAvailable) {
-    throw new Error(
-      `Ngân hàng hiện chỉ có ${totalAvailable} câu hỏi, không thể tạo đề ${data.questionCount} câu`
-    );
+    throw new Error(`Ngân hàng hiện chỉ có ${totalAvailable} câu hỏi, không thể tạo đề ${data.questionCount} câu`);
   }
 
   // Chia số câu theo lesson
@@ -160,10 +158,7 @@ const add = async (data) => {
 
     // Tính số câu theo difficulty
     let easyCount = Math.round(lessonQuestionCount * selectedDifficulty.easy);
-
     let mediumCount = Math.round(lessonQuestionCount * selectedDifficulty.medium);
-
-    // hard lấy phần còn lại
     let hardCount = lessonQuestionCount - easyCount - mediumCount;
 
     // lấy toàn bộ question 
@@ -181,7 +176,6 @@ const add = async (data) => {
     mediumQuestions = mediumQuestions.sort(() => Math.random() - 0.5);
     hardQuestions = hardQuestions.sort(() => Math.random() - 0.5);
 
-
     if (hardQuestions.length < hardCount) {
       const missing = hardCount - hardQuestions.length;
       hardCount = hardQuestions.length; mediumCount += missing;
@@ -196,7 +190,6 @@ const add = async (data) => {
       easyCount = easyQuestions.length;
       throw new Error(`Câu hỏi không đủ để tạo đề ở lesson: ${lessonId}`);
     }
-
 
     // lấy question cuối cùng
     const selectedQuestions = [
@@ -228,7 +221,7 @@ const add = async (data) => {
       () => Math.random() - 0.5
     );
 
-  const newtitle = "Đề thi môn: " + name_subject.name;
+  const newtitle = "Đề trắc nghiệm môn: " + name_subject.name;
 
   const newExam = await examM.create({
 

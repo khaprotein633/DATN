@@ -327,29 +327,32 @@ const Result = () => {
                           Độ khó
                         </p>
 
-                        <Tag
-                          color={
-                            result.difficulty_mode === "easy"
-                              ? "green"
-                              : result.difficulty_mode === "medium"
-                                ? "orange"
-                                : "red"
-                          }
-                          style={{
-                            fontWeight: 600,
-                            padding: "5px 16px",
-                            borderRadius: "999px",
-                            fontSize: "14px",
-                          }}
-                        >
-                          {
-                            result.difficulty_mode === "easy"
-                              ? "Dễ"
-                              : result.difficulty_mode === "medium"
-                                ? "Trung bình"
-                                : "Khó"
-                          }
-                        </Tag>
+                        {(() => {
+                          
+                          const difficultyConfig = {
+                            easy: { color: "green", label: "Dễ" },
+                            medium: { color: "orange", label: "Trung bình" },
+                            hard: { color: "red", label: "Khó" },
+                            all: { color: "blue", label: "Tất cả" } 
+                          };
+
+                         
+                          const currentConfig = difficultyConfig[result.difficulty_mode] || { color: "red", label: "Khó" };
+
+                          return (
+                            <Tag
+                              color={currentConfig.color}
+                              style={{
+                                fontWeight: 600,
+                                padding: "5px 16px",
+                                borderRadius: "999px",
+                                fontSize: "14px",
+                              }}
+                            >
+                              {currentConfig.label}
+                            </Tag>
+                          );
+                        })()}
                       </div>
 
                       {/* Tổng số câu */}
