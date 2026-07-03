@@ -35,7 +35,7 @@ const examSchema = new mongoose.Schema({
   questions: [questionSchema],
   time: { type: Number, required: true },
   total_question: { type: Number, required: true },
-  difficulty_mode: { type: String, enum: ["easy", "medium", "hard"], required: true, },
+  difficulty_mode: { type: String, enum: ["easy", "medium", "hard","all"], required: true, },
   created_by: { type: mongoose.Schema.Types.ObjectId, ref: "User",required: true },
   description: { type: String, required: true },
 }, {
