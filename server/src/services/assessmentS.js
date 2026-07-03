@@ -39,27 +39,22 @@ const getBySubjectId = async (subject_id, user_id) => {
         }
         return false;
     });
-    const assessmentResults = validResults.slice(0, 10);
+    const assessmentResults = validResults.slice(0, 15);
     const historyResults = validResults;
 
-    // Thống kê tổng thể theo môn học
-    const totalExams = await examM.countDocuments({
-        created_by: user_id, subject_id: subject_id
-    });
+    // thống kê tổng thể theo môn học
+    const totalExams = await examM.countDocuments({ created_by: user_id, subject_id: subject_id });
     const totalAttempts = historyResults.length;
     const scores = historyResults.map(r => r.score);
     const avgScore = scores.reduce((sum, s) => sum + s, 0) / totalAttempts;
     const bestScore = Math.max(...scores);
     const worstScore = Math.min(...scores);
     // lấy lịch sử làm bài 
-    const progressChart = historyResults
-        .slice()
-        .reverse()
-        .map((result, index) => ({
-            attempt: index + 1,
-            score: result.score,
-            date: result.createdAt
-        }));
+    const progressChart = historyResults.slice().reverse().map((result, index) => ({
+        attempt: index + 1,
+        score: result.score,
+        date: result.createdAt
+    }));
 
     // Lấy danh sách chương và bài học để ánh xạ tên
     const chapters = await chapterM.find({ subject_id }).sort({ order: 1 });;
@@ -82,7 +77,7 @@ const getBySubjectId = async (subject_id, user_id) => {
         lessonOrderMap[lesson._id] = lesson.order;
     });
 
-    // thực hiện tính toán đánh giá dựa trên kết quả 10 bài thi gần nhất
+    // thực hiện tính toán đánh giá dựa trên kết quả 15 bài thi gần nhất
     const allAnswers = assessmentResults.flatMap(r => r.answers);
     // thống kê theo chương và bài học
     const chapterMap = {};
@@ -171,20 +166,16 @@ const getBySubjectId = async (subject_id, user_id) => {
 
     const knowledgeMap = {};
     allAnswers.forEach(answer => {
-
         if (!knowledgeMap[answer.knowledgeType]) {
             knowledgeMap[answer.knowledgeType] = {
                 total: 0,
                 correct: 0
             };
         }
-
         knowledgeMap[answer.knowledgeType].total++;
-
         if (answer.isCorrect) {
             knowledgeMap[answer.knowledgeType].correct++;
         }
-
     });
     const knowledgeStats = {};
     Object.entries(knowledgeMap).forEach(
@@ -222,27 +213,55 @@ const getBySubjectId = async (subject_id, user_id) => {
 
     });
 
-    const strongCount = strongest.length;
-    const weakCount = weaknesses.length;
+    //const strongCount = strongest.length;
+    //const weakCount = weaknesses.length;
 
     let summary = "";
 
-    if (avgScore >= 7.5) {
-        summary =
-            "Bạn đang có kết quả học tập tốt, cho thấy khả năng nắm vững kiến thức trong môn học.";
+    const recentResults = historyResults.slice(0, 5);
+    const recentScores = recentResults.map(r => r.score);
+    const recentAvg = recentScores.reduce((sum, s) => sum + s, 0) / recentResults.length;
+
+    if (historyResults.length > recentResults.length) {
+        // Lấy các bài cũ hơn trước đó
+        const olderResults = historyResults.slice(recentResults.length);
+        const olderScores = olderResults.map(r => r.score);
+        const olderAvg = olderScores.reduce((sum, s) => sum + s, 0) / olderResults.length;
+
+        // Định nghĩa biên độ tiến bộ (ví dụ: điểm gần đây cao hơn điểm cũ từ 1 điểm trở lên)
+        const improvementThreshold = 1.0;
+
+        if (recentAvg - olderAvg >= improvementThreshold) {
+            summary = `Bạn đang có sự tiến bộ vượt bậc! Dù giai đoạn đầu gặp khó khăn, phong độ gần đây của bạn (Trung bình ${recentAvg.toFixed(1)} điểm) đang tăng trưởng rất tốt. Hãy tiếp tục duy trì đà này nhé!`;
+        } else if (olderAvg - recentAvg >= improvementThreshold) {
+            summary = `Phong độ gần đây của bạn đang có dấu hiệu sụt giảm so với giai đoạn đầu. Hãy xem lại các đề xuất ôn tập bên dưới để lấy lại phong độ nhé.`;
+        }
     }
-    else if (avgScore >= 6.5) {
-        summary =
-            "Bạn có kết quả học tập khá, tuy nhiên vẫn cần củng cố thêm một số kiến thức để nâng cao kết quả.";
+
+    if (!summary) {
+        if (recentAvg >= 7.5) {
+            summary = "Bạn đang giữ vững phong độ học tập tốt, các bài thi gần đây cho thấy bạn nắm rất chắc kiến thức.";
+        } else if (recentAvg >= 6.5) {
+            summary = "Kết quả các bài thi gần đây của bạn ở mức khá. Chỉ cần tập trung củng cố thêm vài lỗ hổng là có thể bứt phá lên điểm giỏi.";
+        } else if (recentAvg >= 5) {
+            summary = "Phong độ hiện tại của bạn đang ở mức trung bình. Bạn cần kiên trì luyện tập và bám sát các chương chưa đạt để cải thiện điểm số.";
+        } else {
+            summary = "Kết quả các bài làm gần đây còn hạn chế. Bạn nên tạm dừng làm đề mới và dành thời gian đọc lại lý thuyết các phần cốt lõi.";
+        }
     }
-    else if (avgScore >= 5) {
-        summary =
-            "Kết quả học tập của bạn đang ở mức trung bình, cần tiếp tục ôn tập để cải thiện khả năng nắm bắt kiến thức.";
-    }
-    else {
-        summary =
-            "Kết quả học tập của bạn còn hạn chế, cần tập trung củng cố lại các kiến thức nền tảng.";
-    }
+
+    // if (avgScore >= 7.5) {
+    //     summary = "Bạn đang có kết quả học tập tốt, cho thấy khả năng nắm vững kiến thức trong môn học.";
+    // }
+    // else if (avgScore >= 6.5) {
+    //     summary = "Bạn có kết quả học tập khá, tuy nhiên vẫn cần củng cố thêm một số kiến thức để nâng cao kết quả.";
+    // }
+    // else if (avgScore >= 5) {
+    //     summary = "Kết quả học tập của bạn đang ở mức trung bình, cần tiếp tục ôn tập để cải thiện khả năng nắm bắt kiến thức.";
+    // }
+    // else {
+    //     summary = "Kết quả học tập của bạn còn hạn chế, cần tập trung củng cố lại các kiến thức nền tảng.";
+    // }
 
     return {
         overview: {
@@ -263,7 +282,6 @@ const getBySubjectId = async (subject_id, user_id) => {
     };
 
 };
-
 
 module.exports = {
     getBySubjectId
