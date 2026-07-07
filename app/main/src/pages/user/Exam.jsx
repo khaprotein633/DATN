@@ -6,7 +6,7 @@ import { getByID, removeExam } from "../../services/examService";
 import { getAllByExam } from "../../services/resultService";
 import { add } from "../../services/resultService";
 import { useAuth } from "../../contexts/AuthContext";
-import { Modal, Image } from "antd";
+import { Modal, Image ,Tag} from "antd";
 import ExamSkeleton from "../user/skeleton/ExamSkeleton";
 
 const Exam = () => {
@@ -15,7 +15,7 @@ const Exam = () => {
   const navigate = useNavigate();
 
   const [exam, setExam] = useState(null);
-   const [results, setResults] = useState([]);
+  const [results, setResults] = useState([]);
   const [examLoading, setExamLoading] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -113,7 +113,7 @@ const Exam = () => {
     } catch (err) {
       console.error(err);
       toast.error(err.message || "Tải kết quả thất bại");
-    } 
+    }
   };
 
   const currentQuestion = exam?.questions[currentQuestionIndex];
@@ -188,8 +188,8 @@ const Exam = () => {
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
-          if(results.length === 0) {
-          await removeExam(id);
+          if (results.length === 0) {
+            await removeExam(id);
           }
           localStorage.removeItem(storageKey);
           navigate("/student/create/test");
@@ -387,9 +387,23 @@ const Exam = () => {
                 <span>Thời gian</span>
                 <span>{exam.time} phút</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span>Độ khó</span>
-                <span>{exam.difficulty}</span>
+                <Tag
+                  color={{
+                    easy: "green",
+                    medium: "orange",
+                    hard: "red",
+                    mixed: "blue",
+                  }[exam.difficulty_mode] || "default"}
+                >
+                  {{
+                    easy: "Dễ",
+                    medium: "Trung bình",
+                    hard: "Khó",
+                    mixed: "Hỗn hợp",
+                  }[exam.difficulty_mode] || "Không xác định"}
+                </Tag>
               </div>
               <div className="flex justify-between">
                 <span>Chương</span>
