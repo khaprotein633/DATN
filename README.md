@@ -55,7 +55,7 @@ CLOUDINARY_API_SECRET=
 * `API_KEY`: API Key của Google Gemini dùng cho chức năng chatbot.
 * `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: Thông tin cấu hình Cloudinary dùng để lưu trữ hình ảnh.
 
-> **Lưu ý:** Các thông tin trên là thông tin bảo mật nên không được đưa lên GitHub. Người dùng cần tự tạo file `.env` và cung cấp các giá trị phù hợp trước khi chạy hệ thống.
+> **Lưu ý:** Các thông tin trên là thông tin bảo mật nên không được đưa lên GitHub. Nếu bạn cần thì hãy liên hệ mình để lấy qua mail nha.
 
 ### Bước 2: Cài đặt thư viện
 
